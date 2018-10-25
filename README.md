@@ -1,6 +1,7 @@
 # CatalystFabricUI
 
 To launch the project, please follow these steps:
+
 1. Clone the repository:
 > git clone git@bitbucket.org:intellecteu/catalystfabricui.git
 
