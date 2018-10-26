@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Form, Input, Button, Upload, Icon, message } from 'antd';
+import { inject, observer } from 'mobx-react';
+import PropTypes from 'prop-types'
 
 const props = {
   name: 'file',
@@ -34,6 +36,8 @@ export default class Settings extends Component {
 
 const FormItem = Form.Item;
 
+@inject('SettingsStore')
+@observer
 class SettingsForm extends Component {
   constructor() {
     super();
@@ -47,7 +51,30 @@ class SettingsForm extends Component {
   }
 
   handleOrganizationInput = (e) => {
+    console.log('this.props.SettingsStore - before', this.props.SettingsStore)
     window.localStorage.setItem('orgName', e.target.value)
+    this.props.SettingsStore.defineOrgName(e.target.value)
+    console.log('this.props.SettingsStore', this.props.SettingsStore)
+  }
+
+  handleDomainInput = (e) => {
+    window.localStorage.setItem('domain', e.target.value)
+    this.props.SettingsStore.setDomain(e.target.value)
+    console.log('this.props.SettingsStore', this.props.SettingsStore)
+  }
+
+  getOrgName = () => {
+    const orgName = this.props.SettingsStore.orgName
+    const orgNameFromLS = window.localStorage.getItem('orgName')
+
+    return orgName || orgNameFromLS
+  }
+
+  getDomain = () => {
+    const domain = this.props.SettingsStore.domain
+    const domainFromLS = window.localStorage.getItem('domain')
+    
+    return domain || domainFromLS
   }
 
   render() {
@@ -63,7 +90,9 @@ class SettingsForm extends Component {
         wrapperCol: { span: 24, offset: 4 },
     }
     const ButtonGroup = Button.Group;
-    const organizationName = window.localStorage.getItem('orgName') || 'Enter organization name'
+    const organizationNamePlaceholder = this.getOrgName() || 'Enter organization name'
+    const domainPlaceholder = this.getDomain() || 'Enter domain'
+
     return (
       <div>
         <Form layout={formLayout}>
@@ -71,13 +100,13 @@ class SettingsForm extends Component {
             label="Organization name"
             {...formItemLayout}
           >
-            <Input placeholder={organizationName} onChange={this.handleOrganizationInput} />
+            <Input placeholder={organizationNamePlaceholder} onChange={this.handleOrganizationInput} />
           </FormItem>
           <FormItem
             label="Domain"
             {...formItemLayout}
           >
-            <Input placeholder="Enter domain" />
+            <Input placeholder={domainPlaceholder} onChange={this.handleDomainInput} />
           </FormItem>
           <FormItem {...ExpImpButtonItemLayout}>
           <ButtonGroup>

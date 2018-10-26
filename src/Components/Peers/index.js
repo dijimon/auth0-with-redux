@@ -1,25 +1,16 @@
 import React, { Component, Fragment } from 'react'
 import { Card, Table, Input, InputNumber, Popconfirm, Form, Button } from 'antd';
+import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types'
 import './styles.css'
-
+@inject('PeersStore')
+@observer
 export default class Peers extends Component {
 
     static propTypes = {
       history: PropTypes.shape({
         push: PropTypes.func.isRequired,
       }),
-    }
-
-    constructor (props) {
-      super(props)
-
-      this.state = {
-        collapsed: false,
-        theme: this.props.theme,
-        current: '1',
-        // current: props.match.path,
-      }
     }
 
     render() {
@@ -86,11 +77,20 @@ class EditableCell extends React.Component {
     );
   }
 }
-
+@inject('PeersStore')
+@observer
 class PeersTable extends Component {
   constructor(props) {
     super(props);
-    // this.state = { data, editingKey: '', delitingKey: '' };
+
+    this.state = {
+      editingKey: '', 
+      delitingKey: '',
+      dataSource: [],
+      count: 0,
+      isCreating: false
+    };
+
     this.columns = [
       {
         title: 'NAME',
@@ -121,6 +121,7 @@ class PeersTable extends Component {
         dataIndex: 'action',
         render: (text, record) => {
           const editable = this.isEditing(record);
+          const isCreating = this.state.isCreating
           return (
               <Fragment>
             <div>
@@ -128,83 +129,79 @@ class PeersTable extends Component {
                 <span>
                   <EditableContext.Consumer>
                     {form => (
-                      <a
+                      !isCreating ? 
+                      (<a
                         href="javascript:;"
                         onClick={() => this.save(form, record.key)}
                         style={{ marginRight: 8 }}
                       >
                         Save
-                      </a>
+                      </a>) :
+                      (<a
+                        href="javascript:;"
+                        onClick={() => this.create(form, record.key)}
+                        style={{ marginRight: 8 }}
+                      >
+                        Create
+                      </a>)
                     )}
                   </EditableContext.Consumer>
-                  <Popconfirm
+                  {!editable && <Popconfirm
                     title="Sure to cancel?"
                     onConfirm={() => this.cancel(record.key)}
                   >
                     <a>Cancel</a>
-                  </Popconfirm>
+                  </Popconfirm>}
                 </span>
               ) : (
                 <a onClick={() => this.edit(record.key)}>Edit</a>
               )}
-              <span style={{marginLeft: 10}}><a onClick={() => this.delete(record.key)}>Delete</a></span>
-              <span style={{marginLeft: 10}}><a onClick={() => this.showLogs(record.key)}>Show logs</a></span>
+              {
+                !editable && 
+                <span>
+                  <span style={{marginLeft: 10}}><a onClick={() => this.delete(record.key)}>Delete</a></span>
+                  <span style={{marginLeft: 10}}><a onClick={() => this.showLogs(record.key)}>Show logs</a></span>
+                </span>
+              }
             </div>
             </Fragment>
           );
         },
       },
-    ];
-    this.state = {
-      dataSource: [],
-      count: 0
-    };
+    ]
   }
 
   componentWillMount = () => {
-    const dataSource = this.generateMockChannels(5);
-    const count = dataSource.length
+    const { PeersStore } = this.props
+    const dataSource = PeersStore.getPeers()
 
     this.setState({
       dataSource,
-      count
+      count: dataSource.length
     })
-  }
-
-  generateMockChannels = (n) => {
-    const data = [];
-    for (let i = 0; i < n; i++) {
-      data.push({
-        key: i.toString(),
-        name: `peer-${i}`,
-        url: `some-url`,
-        channels: `channel-${i}, channel-${i+1}`,
-        status: `ok`
-      });
-    }
-    this.setState({count: data.length})
-    return data
   }
 
   isEditing = (record) => {
     return record.key === this.state.editingKey;
-  };
+  }
 
   edit(key) {
     this.setState({ editingKey: key });
   }
 
   delete(key) {
-    const { dataSource, count } = this.state
-    this.setState({ dataSource: dataSource.filter(item => item.key !== key), count: count-1});
+    const { dataSource } = this.state
+    this.setState({ dataSource: dataSource.filter(item => item.key !== key), count: dataSource.length});
+    this.props.PeersStore.deletePeer(key)
   }
 
   showLogs(key) {
-    console.log('Showing logs')
+    console.log('Showing logs - functionality does not have requirements :(')
   }
 
   add = (key) => {
-    this.setState({ editingKey: key });
+    this.setState({ editingKey: key, isCreating: true });
+
     const { count, dataSource } = this.state;
     const newData = {
       key: key,
@@ -218,19 +215,22 @@ class PeersTable extends Component {
     })
   }
 
-  addMock = () => {
-    const { count, dataSource } = this.state;
-    const newData = {
-      key: count,
-      name: `peer-${count}`,
-      url: 'some-url',
-      channels: `channel-${count}`,
-      status: `ok`
-    };
-    this.setState({
-      dataSource: [...dataSource, newData],
-      count: count + 1,
-    });
+  handleNewData = (row, key) => {
+    const newData = [...this.state.dataSource];
+    const index = newData.findIndex(item => key === item.key);
+    const newCount = this.state.dataSource.length
+
+    if (index > -1) {
+      const item = newData[index];
+      newData.splice(index, 1, {
+        ...item,
+        ...row,
+      });
+      this.setState({ dataSource: newData, editingKey: '', count: newCount });
+    } else {
+      newData.push(row);
+      this.setState({ dataSource: newData, editingKey: '', count: newCount });
+    }
   }
 
   save(form, key) {
@@ -238,21 +238,24 @@ class PeersTable extends Component {
       if (error) {
         return;
       }
-      const newData = [...this.state.dataSource];
-      const index = newData.findIndex(item => key === item.key);
-      const newCount = this.state.dataSource.length
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        this.setState({ dataSource: newData, editingKey: '', count: newCount });
-      } else {
-        newData.push(row);
-        this.setState({ dataSource: newData, editingKey: '', count: newCount });
-      }
+
+      this.handleNewData(row, key);
+      this.props.PeersStore.updatePeer(key, row)
     });
+    // e.target.reset();
+  }
+
+  create(form, key) {
+    form.validateFields((error, row) => {
+      if (error) {
+        return;
+      }
+
+      this.handleNewData(row, key);
+      this.props.PeersStore.addPeer(row);
+      this.setState({ isCreating: false });
+    });
+    // e.target.reset();
   }
 
   cancel = () => {
@@ -282,14 +285,13 @@ class PeersTable extends Component {
         }),
       };
     });
-    const nextChannel = this.state.dataSource.length
+    const nextPeer = this.state.dataSource.length
 
     return (
        <Fragment>
         <div className='topButtonContainer'>
-            <Button className='topButton' type="primary" onClick={() => this.add(nextChannel)}>Add Peer</Button>
-            <Button className='topButton' type="primary" onClick={() => this.addMock(nextChannel)}>Add Mock</Button>
-            <span>Channels:{this.state.count}</span>
+            <Button className='topButton' type="primary" onClick={() => this.add(nextPeer)}>Add Peer</Button>
+            <span>Peers: {this.state.count}</span>
         </div>
       <Table
         components={components}

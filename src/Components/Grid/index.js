@@ -1,5 +1,8 @@
-import { Route, NavLink, Redirect } from 'react-router-dom';
 import React, { Component } from 'react';
+import { Route, NavLink, Redirect } from 'react-router-dom';
+import { inject, observer } from 'mobx-react';
+import { Layout, Switch } from 'antd'
+
 import Peers from './../Peers/index.js'
 import Orderers from './../Orderers/index.js'
 import CAs from './../CAs/index.js'
@@ -8,12 +11,12 @@ import Chaincodes from './../Chaincodes/index.js'
 import Settings from './../Settings/index.js';
 import TheMenu from './../TheMenu/index.js';
 import Home from './../Home/index.js';
-import { Layout, Switch } from 'antd'
 import logo from './../../assets/logo.png'
 import './styles.css'
 
 const { Header, Content, Footer, Sider } = Layout
-
+@inject('SettingsStore')
+@observer
 class Grid extends Component {
     constructor (props) {
         super(props)
@@ -35,8 +38,18 @@ class Grid extends Component {
         });
     }
 
+    getOrgName = () => {
+      const orgName = this.props.SettingsStore.settings.orgName
+      const orgNameFromLS = window.localStorage.getItem('orgName')
+      console.log('!!! orgName', orgName)
+      console.log('!!! this.props.SettingsStore', this.props.SettingsStore)
+  
+  
+      return orgName ? orgName : (orgNameFromLS ? orgNameFromLS : 'Catalyst Fabric')
+    }
+
     render() {
-        const orgName = window.localStorage.getItem('orgName') || 'Catalyst Fabric'
+        const orgName = this.getOrgName()
 
         return (
             <Layout className="rootContainer">
@@ -70,7 +83,7 @@ class Grid extends Component {
                     {orgName}
                   </div>
                 </Header>
-                <Content style={{ margin: '0 16px' }}>
+                <Content style={{ margin: '5px' }}>
                     <Route exact path="/" component={Home} />
                     <Route path="/orderers" component={Orderers} />
                     <Route path="/peers" component={Peers} />

@@ -2,10 +2,7 @@ import React, { Component } from 'react'
 import { Menu, Icon } from 'antd'
 import PropTypes from 'prop-types'
 import { NavLink } from 'react-router-dom'
-import { withRouter } from 'react-router-dom'
-import { observer, inject } from 'mobx-react/index'
 
-// @withRouter
 class TheMenu extends Component {
     static propTypes = {
       history: PropTypes.shape({
@@ -59,7 +56,7 @@ class TheMenu extends Component {
     render() {
         return (
           <Menu
-              defaultSelectedKeys={['1']}
+              defaultSelectedKeys={['0']}
               defaultOpenKeys={['sub1']}
               mode="inline"
               theme={this.state.theme}
