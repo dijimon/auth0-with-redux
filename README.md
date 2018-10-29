@@ -16,3 +16,6 @@ To launch the project, please follow these steps:
 
 5. Launch the project:
 > npm start
+
+6. Create production build:
+> npm run build
