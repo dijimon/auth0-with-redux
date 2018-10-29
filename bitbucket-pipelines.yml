@@ -7,8 +7,8 @@ pipelines:
         caches:
           - node
         script: # Modify the commands below to build your repository.
-          - npm install
-          - npm test
+         # - npm install
+         # - npm test
           - npm run build
           - ls -la
           - find ./ -name index.html
