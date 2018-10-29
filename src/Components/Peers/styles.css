@@ -8,3 +8,10 @@
     min-width: 120px;
     margin: 0 10px 0 0;
 }
+.actionIconContainer:hover {
+    cursor: pointer;
+}
+.actionIcon {
+    width: 30px;
+    height: 30px;
+}

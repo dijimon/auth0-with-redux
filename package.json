@@ -18,12 +18,8 @@
     "mobx"
   ],
   "babel": {
-    "presets": [
-      "react-app"
-    ],
-    "plugins": [
-      "transform-decorators-legacy"
-    ]
+    "presets": ["react-app"],
+    "plugins": ["transform-decorators-legacy"]
   },
   "author": "Michel Weststrate <mweststrate@gmail.com> (http://github.com/mweststrate)",
   "dependencies": {
@@ -59,9 +55,9 @@
     "js-cookie": "^2.2.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.5",
-    "mobx": "^5.5.2",
+    "mobx": "^5.0.3",
     "mobx-persist": "^0.4.1",
-    "mobx-react": "^5.3.5",
+    "mobx-react": "^5.2.3",
     "mobx-react-devtools": "^6.0.1",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
@@ -129,7 +125,6 @@
   },
   "browserslist": [
     ">0.2%",
-    "not dead",
     "not ie <= 11",
     "not op_mini all"
   ],

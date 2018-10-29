@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Card, Table, Input, InputNumber, Popconfirm, Form, Button } from 'antd';
+import { Card, Table, Input, InputNumber, Popconfirm, Form, Button, Icon, Tooltip } from 'antd';
 import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types'
 import './styles.css'
@@ -88,7 +88,8 @@ class PeersTable extends Component {
       delitingKey: '',
       dataSource: [],
       count: 0,
-      isCreating: false
+      isCreating: false,
+      isLoading: false
     };
 
     this.columns = [
@@ -112,7 +113,7 @@ class PeersTable extends Component {
       },
       {
         title: 'STATUS',
-        dataIndex: 'status',
+        dataIndex: 'status.phase',
         width: '15%',
         editable: true,
       },
@@ -154,13 +155,29 @@ class PeersTable extends Component {
                   </Popconfirm>}
                 </span>
               ) : (
-                <a onClick={() => this.edit(record.key)}>Edit</a>
+                <Tooltip className="actionIcon" placement="top" title="Edit">
+                  <a onClick={() => this.edit(record.key)}>
+                    <Icon className="actionIcon" type="edit" />
+                  </a>
+                </Tooltip>
               )}
               {
-                !editable && 
+                !editable &&
                 <span>
-                  <span style={{marginLeft: 10}}><a onClick={() => this.delete(record.key)}>Delete</a></span>
-                  <span style={{marginLeft: 10}}><a onClick={() => this.showLogs(record.key)}>Show logs</a></span>
+                  <span className="actionIconContainer" style={{marginLeft: 10}}>
+                    <Tooltip placement="top" title="Delete">
+                      <a onClick={() => this.delete(record.uid)}>
+                        <Icon className="actionIcon" type="delete" />
+                      </a>
+                    </Tooltip>
+                  </span>
+                  <span className="actionIconContainer" style={{marginLeft: 10}}>
+                    <Tooltip placement="top" title="Show logs">
+                      <a onClick={() => this.showLogs(record.key)}>
+                        <Icon className="actionIcon" type="file-done" />
+                      </a>
+                    </Tooltip>
+                  </span>
                 </span>
               }
             </div>
@@ -171,14 +188,28 @@ class PeersTable extends Component {
     ]
   }
 
-  componentWillMount = () => {
-    const { PeersStore } = this.props
-    const dataSource = PeersStore.getPeers()
+  generateMockPeers = (n) => {
+    const data = [];
+    for (let i = 0; i < n; i++) {
+      data.push({
+        key: i.toString(),
+        name: `peer-${i}`,
+        url: `peer-${i}.domain.com`,
+        channels: `channel-${i}, channel-${i+1}`,
+        status: 'ok'
+      });
+    }
+    return data
+  }
 
-    this.setState({
-      dataSource,
-      count: dataSource.length
+  componentDidMount = async () => {
+    this.setState({ isLoading: true })
+    await this.props.PeersStore.getPeers()
+    .then((response) => {
+      this.setState({ dataSource: response, isLoading: false })
     })
+    .then(() => console.log('store = ',this.store.dataSource))
+    .catch(error => this.setState({ error, isLoading: false }))
   }
 
   isEditing = (record) => {
@@ -190,8 +221,8 @@ class PeersTable extends Component {
   }
 
   delete(key) {
-    const { dataSource } = this.state
-    this.setState({ dataSource: dataSource.filter(item => item.key !== key), count: dataSource.length});
+    // const { dataSource } = this.state
+    // this.setState({ dataSource: dataSource.filter(item => item.key !== key), count: dataSource.length});
     this.props.PeersStore.deletePeer(key)
   }
 
@@ -285,10 +316,10 @@ class PeersTable extends Component {
         }),
       };
     });
-    const nextPeer = this.state.dataSource.length
+    const nextPeer = this.state.dataSource ? this.state.dataSource.length : 0
 
     return (
-       <Fragment>
+        <Fragment>
         <div className='topButtonContainer'>
             <Button className='topButton' type="primary" onClick={() => this.add(nextPeer)}>Add Peer</Button>
             <span>Peers: {this.state.count}</span>
@@ -297,8 +328,10 @@ class PeersTable extends Component {
         components={components}
         bordered
         dataSource={this.state.dataSource}
+        rowKey="uid"
         columns={columns}
         rowClassName="editable-row"
+        loading={this.state.isLoading}
       />
       </Fragment>
     );
