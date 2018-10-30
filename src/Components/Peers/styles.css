@@ -1,0 +1,17 @@
+.topButtonContainer {
+    margin-bottom: 16px; 
+    min-width: 150px;
+    display: flex;
+    flex-direction: row;
+}
+.topButtonContainer .topButton {
+    min-width: 120px;
+    margin: 0 10px 0 0;
+}
+.actionIconContainer:hover {
+    cursor: pointer;
+}
+.actionIcon {
+    width: 30px;
+    height: 30px;
+}
