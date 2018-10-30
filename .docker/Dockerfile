@@ -5,7 +5,7 @@ RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
 ADD .docker/nginx.conf /etc/nginx/
 ADD .docker/mustr.conf /etc/nginx/conf.d/
 
-COPY ./ /var/www/
+COPY ./build /var/www/
 
 WORKDIR /var/www
 
