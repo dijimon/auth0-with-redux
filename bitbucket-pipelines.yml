@@ -14,6 +14,9 @@ pipelines:
           - npm run build
           - export IMAGE_NAME=gcr.io/fabric-platform/frontend:$BITBUCKET_COMMIT
           - echo $GCLOUD_JSON_FILE > ~/.gcloud-api-key.json
+          - curl https://sdk.cloud.google.com | bash
+          - exec -l $SHELL
+          - gcloud init
           - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
           - docker login -u _json_key -p "$(cat ~/.gcloud-api-key.json)" https://gcr.io/$GCLOUD_PROJECT
           - docker build -t $IMAGE_NAME . -f .docker/Dockerfile
