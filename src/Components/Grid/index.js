@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Route, NavLink, Redirect } from 'react-router-dom';
+import { Route, Redirect, withRouter, Switch } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-import { Layout, Switch } from 'antd'
+import { Layout, Switch as UISwitch } from 'antd'
+import PropTypes from 'prop-types'
 
 import Peers from './../Peers/index.js'
 import Orderers from './../Orderers/index.js'
@@ -17,6 +18,7 @@ import './styles.css'
 const { Header, Content, Footer, Sider } = Layout
 @inject('SettingsStore')
 @observer
+@withRouter
 class Grid extends Component {
     constructor (props) {
         super(props)
@@ -26,6 +28,12 @@ class Grid extends Component {
           theme: 'dark',
           current: 4
         }
+    }
+
+    static propTypes = {
+      history: PropTypes.shape({
+        push: PropTypes.func.isRequired,
+      })
     }
 
     onCollapse = (collapsed) => {
@@ -41,11 +49,12 @@ class Grid extends Component {
     getOrgName = () => {
       const orgName = this.props.SettingsStore.settings.orgName
       const orgNameFromLS = window.localStorage.getItem('orgName')
-      console.log('!!! orgName', orgName)
-      console.log('!!! this.props.SettingsStore', this.props.SettingsStore)
-  
   
       return orgName ? orgName : (orgNameFromLS ? orgNameFromLS : 'Catalyst Fabric')
+    }
+
+    handleLogoClick = () => {
+      this.props.history.push(`/`)
     }
 
     render() {
@@ -62,11 +71,13 @@ class Grid extends Component {
                 >
                     <div className='logoContainer'>
                       <div className={this.state.collapsed ? 'logoSmall' : 'logoBig'}>
-                          <NavLink to="/"><img src={logo} alt="logo" /></NavLink>
+                          <a onClick={this.handleLogoClick}>
+                            <img src={logo} alt="logo" />
+                          </a>
                       </div>
                     </div>
                     <div style={{margin: 10, minHeight: 35}}>
-                      <Switch
+                      <UISwitch
                         style={this.state.collapsed ? {display: 'none'} : {display: 'inline-block'}}
                         checked={this.state.theme === 'dark'}
                         onChange={this.changeTheme}
@@ -84,6 +95,7 @@ class Grid extends Component {
                   </div>
                 </Header>
                 <Content style={{ margin: '5px' }}>
+                  <Switch>
                     <Route exact path="/" component={Home} />
                     <Route path="/orderers" component={Orderers} />
                     <Route path="/peers" component={Peers} />
@@ -92,6 +104,7 @@ class Grid extends Component {
                     <Route path="/chaincodes" component={Chaincodes} />
                     <Route path="/settings" component={Settings} />
                     <Redirect from='*' to='/' />
+                  </Switch>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
                   Created by IntellectEU ©2018

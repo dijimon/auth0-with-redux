@@ -1,7 +1,7 @@
 import { observable, action, computed } from 'mobx';
 
 class ChannelsStore {
-  @observable channels = this.generateMockChannels(3)
+  @observable channels = this.generateMockChannels(100)
 
   generateMockChannels = (n) => {
     const data = [];
