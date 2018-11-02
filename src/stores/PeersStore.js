@@ -42,15 +42,11 @@ class PeersStore {
 
   @action
   updatePeer = (peer, key) => {
-    // const peerForUpdate = this.peers[key]
-    // for (let key in peerForUpdate) {
-    //   peerForUpdate[key] = newData[key]
-    // }
 
     console.log('In updatePeer, newInfo = ', peer, key)
     console.log('!! key = ', key)
     const url = `${ENDPOINTS.baseURL}${ENDPOINTS.peers}/${key}`
-    return axios.put(url, {'name': peer['name'], 'channels': peer[channels]})
+    return axios.put(url, {'name': peer['name'], 'channels': peer['channels']})
     .then((response) => {
       console.log('UPDATE PEER response ->', response)
       this.peers.push(response.data)
