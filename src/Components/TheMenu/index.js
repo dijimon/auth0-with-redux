@@ -57,7 +57,6 @@ class TheMenu extends Component {
         return (
           <Menu
               defaultSelectedKeys={['0']}
-              defaultOpenKeys={['sub1']}
               mode="inline"
               theme={this.state.theme}
               style={{ maxWidth: 256 }}
@@ -94,7 +93,7 @@ class TheMenu extends Component {
               <Menu.Item key="6">
                 <Icon type="setting" />
                 <span>Settings</span>
-                <NavLink to={`/settings`} className={'navLink'} activeClassName={'active'}>Setting</NavLink>
+                <NavLink to={`/settings`} className={'navLink'} activeClassName={'active'} />
               </Menu.Item>
             </Menu>
         );

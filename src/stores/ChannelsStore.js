@@ -1,5 +1,7 @@
 import { observable, action, computed } from 'mobx';
-
+import axios from 'axios'
+// import axios from './../services/axios'
+import * as ENDPOINTS from './../endpoints'
 class ChannelsStore {
   @observable channels = this.generateMockChannels(100)
 

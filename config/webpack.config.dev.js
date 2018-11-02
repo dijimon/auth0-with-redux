@@ -188,4 +188,17 @@ module.exports = {
   performance: {
     hints: false,
   },
+  devServer: {
+    open: true,
+    historyApiFallback: true,
+    watchOptions: { aggregateTimeout: 300, poll: 1000 },
+    hot: true,
+    port: process.env.PORT || 3000,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    },
+    proxy: 'https://operator.kubernetes.dev.intellecteu.com/api/v1'
+  }
 };

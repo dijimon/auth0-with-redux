@@ -24,3 +24,17 @@
   height: 32px;
   margin: 0 auto;
 }
+.menuContainer {
+  position: fixed;
+    text-align: center;
+    bottom: 0;
+    cursor: pointer;
+    height: 48px;
+    line-height: 48px;
+    color: #fff;
+    background: #002140;
+    z-index: 1;
+    -webkit-transition: all .2s;
+    -o-transition: all .2s;
+    transition: all .2s;
+}

@@ -1,8 +1,10 @@
 .topButtonContainer {
     margin-bottom: 16px; 
     min-width: 150px;
-    display: flex;
+    /* display: flex;
     flex-direction: row;
+    display: flex;
+    justify-content: space-between */
 }
 .topButtonContainer .topButton {
     min-width: 120px;
@@ -14,4 +16,31 @@
 .actionIcon {
     width: 30px;
     height: 30px;
+}
+.selectContainer {
+   line-height: 20px;
+}
+.disabledInput {
+    display: none !important;
+}
+.okStatus {
+    color: 'green';
+    background-color: 'green';
+    font-weight: 700;
+}
+.attnStatus {
+    color: 'orange';
+    background-color: 'orange';
+    font-weight: 700;
+}
+.dangerStatus {
+    color: '#F78154';
+    background-color: '#F78154';
+}
+.statusStyle {
+    font-weight: 700;
+}
+.standartStatus {
+    color: 'blue';
+    font-weight: 700;
 }
