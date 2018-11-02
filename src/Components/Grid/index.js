@@ -21,13 +21,13 @@ const { Header, Content, Footer, Sider } = Layout
 @withRouter
 class Grid extends Component {
     constructor (props) {
-        super(props)
-    
-        this.state = {
-          collapsed: false,
-          theme: 'dark',
-          current: 4
-        }
+      super(props)
+
+      this.state = {
+        collapsed: this.getFromLS('collapsed') || false,
+        theme: this.getFromLS('theme') || 'dark',
+        current: 4
+      }
     }
 
     static propTypes = {
@@ -37,20 +37,33 @@ class Grid extends Component {
     }
 
     onCollapse = (collapsed) => {
-        this.setState({ collapsed });
-      }
+      this.setState({ collapsed }, () => {
+        this.setToLS('collapsed', collapsed)
+      });
+    }
 
     changeTheme = (value) => {
-        this.setState({
-          theme: value ? 'dark' : 'light',
-        });
+      const theme = value ? 'dark' : 'light'
+      this.setState({ theme: theme}, () => {
+        this.setToLS('theme', theme)
+      });
     }
 
     getOrgName = () => {
       const orgName = this.props.SettingsStore.settings.orgName
       const orgNameFromLS = window.localStorage.getItem('orgName')
-  
       return orgName ? orgName : (orgNameFromLS ? orgNameFromLS : 'Catalyst Fabric')
+    }
+
+    setToLS = (key, value) => {
+      const currentSettings = JSON.parse(window.localStorage.getItem('settings')) || {}
+      currentSettings[key] = value
+      window.localStorage.setItem('settings', JSON.stringify(currentSettings));
+    }
+
+    getFromLS = (key) => {
+      const settings = JSON.parse(window.localStorage.getItem('settings'))
+      return settings ? settings[key] : null
     }
 
     handleLogoClick = () => {
@@ -85,7 +98,7 @@ class Grid extends Component {
                         unCheckedChildren="light"
                       />
                     </div>
-                    <TheMenu theme={this.state.theme} mode="inline" defaultSelectedKeys={['1']} current={this.state.current} />
+                    <TheMenu className="menuContainer ant-layout-sider-trigger" theme={this.state.theme} mode="inline" defaultSelectedKeys={['1']} current={this.state.current} />
                     <div style={{margin: 10}} className={this.state.theme === 'dark' ? 'menuOptionsDark' : 'menuOptionsLight'}></div>
                 </Sider>
                 <Layout>

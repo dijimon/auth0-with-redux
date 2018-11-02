@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Card, Table, Input, InputNumber, Popconfirm, Form, Button } from 'antd';
+import { Card, Table, Input, InputNumber, Popconfirm, Form, Button, Tooltip, Icon } from 'antd';
 import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types'
 import './styles.css'
@@ -95,19 +95,19 @@ class ChannelsTable extends Component {
       {
         title: 'NAME',
         dataIndex: 'name',
-        width: '20%',
+        width: '25%',
         editable: true,
       },
       {
         title: 'PEERS',
         dataIndex: 'peers',
-        width: '20%',
+        width: '25%',
         editable: true,
       },
       {
         title: 'CHAINCODES',
         dataIndex: 'chaincodes',
-        width: '20%',
+        width: '25%',
         editable: true,
       },
       {
@@ -148,12 +148,23 @@ class ChannelsTable extends Component {
                   </Popconfirm>}
                 </span>
               ) : (
-                <a onClick={() => this.edit(record.key)}>Edit</a>
+                <Tooltip className="actionIcon" placement="top" title="Edit">
+                  <a onClick={() => this.edit(record.key)}>
+                    <Icon className="actionIcon" type="edit" />
+                  </a>
+                </Tooltip>
               )}
               {
                 !editable && 
                 <span>
-                  <span style={{marginLeft: 10}}><a onClick={() => this.delete(record.key)}>Delete</a></span>
+                  {/* <span style={{marginLeft: 10}}><a onClick={() => this.delete(record.key)}>Delete</a> */}
+                  <span style={{marginLeft: 10}}>
+                  <Tooltip placement="top" title="Delete">
+                      <a onClick={() => this.delete(record.uid)}>
+                        <Icon className="actionIcon" type="delete" />
+                      </a>
+                    </Tooltip>
+                    </span>
                 </span>
               }
             </div>

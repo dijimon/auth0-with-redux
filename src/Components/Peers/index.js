@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react'
-import { Card, Table, Input, InputNumber, Popconfirm, Form, Button, Icon, Tooltip } from 'antd';
-import { inject, observer } from 'mobx-react';
+import { Card, Table, Input, Popconfirm, Form, Button, Icon, Tooltip } from 'antd'
+import Select from 'react-select'
+import { inject, observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 import './styles.css'
-@inject('PeersStore')
-@observer
+// @inject('PeersStore')
+// @observer
 export default class Peers extends Component {
 
     static propTypes = {
@@ -20,28 +21,33 @@ export default class Peers extends Component {
                     <PeersTable />
                 </div>
           </Card>
-        );
+        )
     }
 }
 
-const FormItem = Form.Item;
-const EditableContext = React.createContext();
+const FormItem = Form.Item
+const EditableContext = React.createContext()
 
 const EditableRow = ({ form, index, ...props }) => (
   <EditableContext.Provider value={form}>
     <tr {...props} />
   </EditableContext.Provider>
-);
+)
 
-const EditableFormRow = Form.create()(EditableRow);
+const EditableFormRow = Form.create()(EditableRow)
 
 class EditableCell extends React.Component {
   getInput = () => {
-    if (this.props.inputType === 'number') {
-      return <InputNumber />;
-    }
-    return <Input />;
-  };
+    
+    // if (this.props.inputType === 'number') {
+    //   return <InputNumber />
+    // }
+
+    if (this.props.dataIndex === 'name') {
+      return <Input placeholder='Input name...' />
+    } 
+    else return <Input className="disabledInput" disabled />
+  }
 
   render() {
     const {
@@ -52,45 +58,69 @@ class EditableCell extends React.Component {
       record,
       index,
       ...restProps
-    } = this.props;
+    } = this.props
     return (
       <EditableContext.Consumer>
         {(form) => {
-          const { getFieldDecorator } = form;
+          const { getFieldDecorator } = form
+          
+          const options = [ // will be get from API later
+            { value: 'ch1', label: 'Ch1' },
+            { value: 'ch2', label: 'Ch2' },
+            { value: 'ch3', label: 'Ch3' }
+          ]
+
           return (
             <td {...restProps}>
               {editing ? (
                 <FormItem style={{ margin: 0 }}>
                   {getFieldDecorator(dataIndex, {
-                    rules: [{
-                      required: true,
-                      message: `Please Input ${title}!`,
-                    }],
+                    // rules: [{
+                    //   required: true,
+                    //   message: `Please Input ${title}!`,
+                    // }],
                     initialValue: record[dataIndex],
-                  })(this.getInput())}
+                  })(
+                    dataIndex !== 'channels' ? this.getInput() :
+                    <div>
+                    <Select
+                      className="selectContainer"
+                      onChange={this.handleChannelsChange}
+                      options={options}
+                      placeholder={'Select Сhannel(s)'}
+                      isMulti
+                      isSearchable
+                    />
+                    </div>
+                  )}
                 </FormItem>
               ) : restProps.children}
             </td>
-          );
+          )
         }}
       </EditableContext.Consumer>
-    );
+    )
   }
 }
 @inject('PeersStore')
+@inject('SettingsStore')
 @observer
 class PeersTable extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
-      editingKey: '', 
+      editingKey: 0, 
       delitingKey: '',
       dataSource: [],
       count: 0,
+      isEditing: false,
       isCreating: false,
-      isLoading: false
-    };
+      isLoading: false,
+      selectedChannelOption: null,
+      channels: [],
+      errMessage: ''
+    }
 
     this.columns = [
       {
@@ -116,47 +146,75 @@ class PeersTable extends Component {
         dataIndex: 'status.phase',
         width: '15%',
         editable: true,
+        render: (status) => {
+          const statusText = status ? status : 'Not running'
+          const statusColor =  status && status.toLowerCase() === 'running' ? '#5BC62E' 
+          : (status && status.toLowerCase() === 'failed' ? '#F78154' 
+          : (status && status.toLowerCase() === 'pending' ? '#F2C14E' 
+          : '#ccc'))
+          
+          return <Fragment>
+            <span style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', margin: '10px'}}>
+              <p
+                style={{color: statusColor}}
+                className='statusStyle'>
+                {statusText}
+              </p>
+              </span>
+            </Fragment>
+        }
       },
       {
         title: 'ACTION',
         dataIndex: 'action',
+        width: '15%',
         render: (text, record) => {
-          const editable = this.isEditing(record);
+          const editable = this.isEditing(record)
           const isCreating = this.state.isCreating
           return (
               <Fragment>
             <div>
               {editable ? (
-                <span>
+                <span style={{position: 'absolute',
+                   right: '8%'}}>
                   <EditableContext.Consumer>
                     {form => (
                       !isCreating ? 
-                      (<a
+                      (<Tooltip className="actionIcon" placement="top" title="Save">
+                      <a
                         href="javascript:;"
                         onClick={() => this.save(form, record.key)}
-                        style={{ marginRight: 8 }}
+                        style={{ margin: '0 auto' }}
                       >
-                        Save
-                      </a>) :
-                      (<a
-                        href="javascript:;"
-                        onClick={() => this.create(form, record.key)}
-                        style={{ marginRight: 8 }}
-                      >
-                        Create
-                      </a>)
+                        <Icon className="actionIcon" type="check" />
+                      </a>
+                    </Tooltip>
+                      ) :
+                      (<Tooltip className="actionIcon" placement="top" title="Create">
+                          <a
+                            href="javascript:;"
+                            onClick={() => this.create(form, record.key)}
+                            style={{ marginRight: 8 }}
+                          >
+                            <Icon className="actionIcon" type="plus" />
+                          </a>
+                        </Tooltip>)
                     )}
                   </EditableContext.Consumer>
-                  {!editable && <Popconfirm
+                  {<Popconfirm
                     title="Sure to cancel?"
                     onConfirm={() => this.cancel(record.key)}
                   >
-                    <a>Cancel</a>
+                    <Tooltip className="actionIcon" placement="top" title="Cancel">
+                      <a>
+                        <Icon className="actionIcon" type="close" />
+                      </a>
+                    </Tooltip>
                   </Popconfirm>}
                 </span>
               ) : (
                 <Tooltip className="actionIcon" placement="top" title="Edit">
-                  <a onClick={() => this.edit(record.key)}>
+                  <a onClick={() => this.edit(record.uid)}>
                     <Icon className="actionIcon" type="edit" />
                   </a>
                 </Tooltip>
@@ -165,11 +223,16 @@ class PeersTable extends Component {
                 !editable &&
                 <span>
                   <span className="actionIconContainer" style={{marginLeft: 10}}>
-                    <Tooltip placement="top" title="Delete">
-                      <a onClick={() => this.delete(record.uid)}>
+                    {<Popconfirm
+                    title="Sure to delete?"
+                    onConfirm={() => this.delete(record.uid)}
+                  >
+                    <Tooltip className="actionIcon" placement="top" title="Delete">
+                      <a>
                         <Icon className="actionIcon" type="delete" />
                       </a>
                     </Tooltip>
+                  </Popconfirm>}
                   </span>
                   <span className="actionIconContainer" style={{marginLeft: 10}}>
                     <Tooltip placement="top" title="Show logs">
@@ -182,64 +245,85 @@ class PeersTable extends Component {
               }
             </div>
             </Fragment>
-          );
+          )
         },
       },
     ]
   }
 
-  generateMockPeers = (n) => {
-    const data = [];
-    for (let i = 0; i < n; i++) {
-      data.push({
-        key: i.toString(),
-        name: `peer-${i}`,
-        url: `peer-${i}.domain.com`,
-        channels: `channel-${i}, channel-${i+1}`,
-        status: 'ok'
-      });
-    }
-    return data
+  mergePeersWithItsUrls = (peers) => {
+    return peers.map((peer, index) => {
+      let domain = this.props.SettingsStore.getDomain()
+      let url = {'url' : peer.name.concat(domain)}
+      let channels = {'channels' : ['ch1, ', 'ch2']}
+      return Object.assign({}, peer, url, channels)
+    })
+  }
+
+  handleChannelsChange = (selectedChannelOption) => {
+    this.setState({ selectedChannelOption })
+  }
+
+  getPeers = async () => {
+    await this.props.PeersStore.getPeers()
+    .then((response) => {
+      if (!response) response = []
+      const peersWithUrls = this.mergePeersWithItsUrls(response)
+      this.setState({ dataSource: peersWithUrls, isLoading: false })
+    })
+    .catch(error => this.setState({ error, isLoading: false }))
   }
 
   componentDidMount = async () => {
     this.setState({ isLoading: true })
     await this.props.PeersStore.getPeers()
     .then((response) => {
-      this.setState({ dataSource: response, isLoading: false })
+      if (!response) response = []
+      const peersWithUrls = this.mergePeersWithItsUrls(response)
+      this.setState({ dataSource: peersWithUrls, isLoading: false })
     })
-    .then(() => console.log('store = ',this.store.dataSource))
     .catch(error => this.setState({ error, isLoading: false }))
   }
 
   isEditing = (record) => {
-    return record.key === this.state.editingKey;
+    const result = (record.key) ? record.key === this.state.editingKey : record.uid === this.state.editingKey
+    return result
   }
 
   edit(key) {
-    this.setState({ editingKey: key });
+    this.setState({ editingKey: key })
   }
 
-  delete(key) {
-    // const { dataSource } = this.state
-    // this.setState({ dataSource: dataSource.filter(item => item.key !== key), count: dataSource.length});
-    this.props.PeersStore.deletePeer(key)
+  reloadPeers = () => {
+    this.props.PeersStore.getPeers()
+    .then((response) => {
+      if (!response) response = []
+      const peersWithUrls = this.mergePeersWithItsUrls(response)
+      this.setState({ dataSource: peersWithUrls, isLoading: false })
+    })
+    .catch(error => this.setState({ error, isLoading: false }))
+  }
+
+  async delete(key) {
+    await this.props.PeersStore.deletePeer(key)
+    await this.reloadPeers()
   }
 
   showLogs(key) {
-    console.log('Showing logs - functionality does not have requirements :(')
+    console.log(`Showing logs for peer${key}- functionality does not have requirements :(`)
   }
 
   add = (key) => {
-    this.setState({ editingKey: key, isCreating: true });
+    console.log('In add(), key = ', key)
+    this.setState({ editingKey: key+1, isCreating: true })
 
-    const { count, dataSource } = this.state;
+    const { count, dataSource } = this.state
     const newData = {
-      key: key,
+      key: key+1,
       name: '',
       peers: '',
       chaincodes: ''
-    };
+    }
     this.setState({
       dataSource: [...dataSource, newData],
       count: count+1
@@ -247,51 +331,75 @@ class PeersTable extends Component {
   }
 
   handleNewData = (row, key) => {
-    const newData = [...this.state.dataSource];
-    const index = newData.findIndex(item => key === item.key);
+    const newData = [...this.state.dataSource]
+    const index = newData.findIndex(item => key === item.key)
     const newCount = this.state.dataSource.length
 
     if (index > -1) {
-      const item = newData[index];
+      const item = newData[index]
       newData.splice(index, 1, {
         ...item,
         ...row,
-      });
-      this.setState({ dataSource: newData, editingKey: '', count: newCount });
+      })
+      this.setState({ dataSource: newData, editingKey: '', count: newCount })
     } else {
-      newData.push(row);
-      this.setState({ dataSource: newData, editingKey: '', count: newCount });
+      newData.push(row)
+      this.setState({ dataSource: newData, editingKey: '', count: newCount })
     }
   }
 
   save(form, key) {
-    form.validateFields((error, row) => {
+    form.validateFields((error, row, key) => {
       if (error) {
-        return;
+        return
       }
 
-      this.handleNewData(row, key);
-      this.props.PeersStore.updatePeer(key, row)
-    });
-    // e.target.reset();
+      const {editingKey} = this.state
+      // this.handleNewData(row, key)
+      this.props.PeersStore.updatePeer(row, editingKey)
+      .then(() => {
+        this.props.PeersStore.getPeers()
+        .then((response) => { 
+          const peerWithUrls = this.mergePeersWithItsUrls(response)
+          this.setState({ dataSource: peerWithUrls, isLoading: false, editingKey: -1})
+        })
+      })
+      .catch(error => this.setState({ error, isLoading: false }))
+    })
+    // e.target.reset()
   }
 
-  create(form, key) {
+  create = (form, key) => {
     form.validateFields((error, row) => {
       if (error) {
-        return;
+        return
       }
-
-      this.handleNewData(row, key);
-      this.props.PeersStore.addPeer(row);
-      this.setState({ isCreating: false });
-    });
-    // e.target.reset();
+      // this.handleNewData(row, key)
+      const ds = this.state.dataSource
+      ds.pop()
+      this.setState({ isCreating: false, isLoading: true, dataSource: ds})
+      this.props.PeersStore.addPeer(row)
+        .then((response) => {
+          if (!response) response = []
+          if (response.message) {
+            this.setState({hasError: true, errMessage: response.message})
+          }
+          console.log('IN CREATE, response = ', response)
+          const peerWithUrls = this.mergePeersWithItsUrls([response])
+          console.log('NEW PEER:', peerWithUrls)
+          const {dataSource: updatedDataSource} = this.state
+          updatedDataSource.push(peerWithUrls[0])
+          console.log('updatedDataSource', updatedDataSource)
+          this.setState({ dataSource: updatedDataSource, isLoading: false })
+        })
+        .catch(error => this.setState({ error, isLoading: false }))
+    })
+    // e.target.reset()
   }
 
   cancel = () => {
-    this.setState({ editingKey: '' });
-  };
+    this.setState({ editingKey: '' })
+  }
 
   render() {
     const components = {
@@ -299,11 +407,11 @@ class PeersTable extends Component {
         row: EditableFormRow,
         cell: EditableCell,
       },
-    };
+    }
 
     const columns = this.columns.map((col) => {
       if (!col.editable) {
-        return col;
+        return col
       }
       return {
         ...col,
@@ -314,15 +422,29 @@ class PeersTable extends Component {
           title: col.title,
           editing: this.isEditing(record),
         }),
-      };
-    });
+      }
+    })
     const nextPeer = this.state.dataSource ? this.state.dataSource.length : 0
 
     return (
         <Fragment>
         <div className='topButtonContainer'>
-            <Button className='topButton' type="primary" onClick={() => this.add(nextPeer)}>Add Peer</Button>
-            <span>Peers: {this.state.count}</span>
+            <Button
+              disabled={this.state.isCreating}
+              className='topButton' 
+              type="primary" 
+              onClick={() => this.add(nextPeer)}>
+              <Icon type="plus" />Add Peer
+            </Button>
+            <Button
+              disabled={this.state.isCreating}
+              className='topButton' 
+              type="primary" 
+              onClick={() => this.reloadPeers()}>
+              <Icon type="reload" />Reload
+            </Button>
+            <span> Total Peers: {this.state.dataSource.length}</span>
+            <span style={{color: 'red'}} id="errorMessage">{this.state.errMessage}</span>
         </div>
       <Table
         components={components}
@@ -334,6 +456,6 @@ class PeersTable extends Component {
         loading={this.state.isLoading}
       />
       </Fragment>
-    );
+    )
   }
 }

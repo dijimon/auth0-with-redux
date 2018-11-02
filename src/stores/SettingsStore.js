@@ -2,8 +2,8 @@ import { observable, action } from 'mobx';
 
 class SettingsStore {
   @observable settings = {
-      orgName: '',
-      domain: '',
+      orgName: window.localStorage.getItem('orgName') || 'Catalyst Fabric',
+      domain: window.localStorage.getItem('domain') || 'domain',
       importedCrypto: '',
       exportedCrypto: ''
     }
@@ -25,7 +25,7 @@ class SettingsStore {
 
   @action
   getDomain = () => {
-    return this.settings.domain
+    return '@'.concat(this.settings.domain).concat('.com')
   }
 
 }

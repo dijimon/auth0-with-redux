@@ -188,4 +188,36 @@ module.exports = {
   performance: {
     hints: false,
   },
+  devServer: {
+    open: true,
+    historyApiFallback: true,
+    watchOptions: { aggregateTimeout: 300, poll: 1000 },
+    hot: true,
+    port: process.env.PORT || 3000,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    },
+    // proxy: {
+    //   "/api/v1/peers" : {
+    //     "target": "http://localhost:3000",
+    //     "changeOrigin": true
+    //   }
+    proxy: 'https://operator.kubernetes.dev.intellecteu.com/api/v1'
+        // proxy: {
+        //   'https://operator.kubernetes.dev.intellecteu.com': {
+        //     target: 'http://localhost:3000',
+        //     // context: () => true
+        //   }
+        // }
+      // },
+      // 'https://operator.kubernetes.dev.intellecteu.com/api/v1*': 'http://localhost:3000'
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:3000',
+    //     pathRewrite: {'^/api' : ''}
+    //   }
+    //   }
+  }
 };

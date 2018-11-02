@@ -1,56 +1,37 @@
 import { observable, action, computed } from 'mobx';
-import axios from 'axios'
-// import axios from './../services/axios'
+// import axios from 'axios'
+import axios from './../services/axios'
 import * as ENDPOINTS from './../endpoints'
 
 class PeersStore {
-  //@observable peers = []
-  // @observable peers = this.generateMockPeers(5)
   @observable peers = []
-
-  generateMockPeers = (n) => {
-    const data = [];
-    for (let i = 0; i < n; i++) {
-      data.push({
-        key: i.toString(),
-        uid: i.toString(),
-        name: `peer-${i}`,
-        url: `peer-${i}.domain.com`,
-        channels: `channel-${i}, channel-${i+1}`,
-        status: 'ok'
-      });
-    }
-    return data
-  }
+  @observable hasError = false
 
   @action
   addPeer = async peer => {
-    const url = `https://cors.io/?${ENDPOINTS.baseURL}${ENDPOINTS.peers}`
-    const config = {
-      method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin' : '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
+    const url = `${ENDPOINTS.baseURL}${ENDPOINTS.peers}`
+    return axios.post(url, {'name': peer['name']})
+    .then((response) => {
+      console.log('ADD PEER response ->', response)
+      this.peers.push(response.data)
+      if(response.status === 200 || response.status === 201) {
+        this.peers.push(response.data)
+        return response.data
+      } else {
+        return response
       }
-    }
-
-    const response = await axios.post(url, config)
-    const responseJSON = await response.json()
-
-    console.log('response ', response)
-    console.log('responseJSON', responseJSON)
-
-    this.peers.push(peer)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
   };
 
   @action
   getPeers = () => {
-    const url = `https://cors.io/?${ENDPOINTS.baseURL}/api/v1/peers`
+    const url = `${ENDPOINTS.baseURL}/api/v1/peers`
     return axios.get(url)
     .then((response) => {
-      console.log('response ->', response)
+      console.log('GET PEERS response ->', response)
       this.peers = response.data
       return response.data
     })
@@ -59,56 +40,47 @@ class PeersStore {
     })
   }
 
-  // @action
-  // getPeers = () => {
-  //   const url = `https://cors.io/?${ENDPOINTS.baseURL}${ENDPOINTS.peersEndoint}`
-  //   axios.defaults.headers.post['crossDomain'] = true;
-  //   return axios
-  //     .get(url, {
-  //       headers: {
-  //       'Access-Control-Allow-Origin' : '*',
-  //       'Content-Type': 'application/json',
-  //       'Access-Control-Allow-Methods': 'GET, OPTIONS'
-  //     }})
-  //     .then(response => {
-  //       console.log('action getPeers, response: ', response)
-  //       console.log(response.data);
-  //       console.log(response.status);
-  //       console.log(response.statusText);
-  //       console.log(response.headers);
-  //       console.log(response.config);
-  //       // if (response.jdata.status === 200) {
-  //       //   this.peers = response.data.json()
-  //       // }
-  //       // return response.json()
-  //     })
-  //     // .catch(e => {
-  //     //   console.error('ERROR from getPeers: ->', e)
-  //     // })
-  // }
-
   @action
-  updatePeer = (key, newData) => {
-    const peerForUpdate = this.peers[key]
-    for (let key in peerForUpdate) {
-      peerForUpdate[key] = newData[key]
-    }
+  updatePeer = (peer, key) => {
+    // const peerForUpdate = this.peers[key]
+    // for (let key in peerForUpdate) {
+    //   peerForUpdate[key] = newData[key]
+    // }
+
+    console.log('In updatePeer, newInfo = ', peer, key)
+    console.log('!! key = ', key)
+    const url = `${ENDPOINTS.baseURL}${ENDPOINTS.peers}/${key}`
+    return axios.put(url, {'name': peer['name'], 'channels': peer[channels]})
+    .then((response) => {
+      console.log('UPDATE PEER response ->', response)
+      this.peers.push(response.data)
+      // if(response.status === 200 || response.status === 201) {
+        this.peers.push(response.data)
+        return response.data
+      // } else {
+      //   this.hasError = true
+      //   return response.status.concat(response.message)
+      // }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+    
   }
 
   @action
   deletePeer = (key) => {
-    console.log('!!! In deleted store', key)
-    // const deleted = this.peers.filter(item => !valuesToRemove.includes(item))
-    const filteredPeers = this.peers.filter(item => item.uid !== key)
-    this.peers = filteredPeers
-    console.log('Peers = ', this.peers)
-
-    const url = `https://cors.io/?${ENDPOINTS.baseURL}${ENDPOINTS.peers}/${key}`
+    const url = `${ENDPOINTS.baseURL}${ENDPOINTS.peers}/${key}`
     return axios.delete(url)
     .then((response) => {
-      console.log('response ->', response)
-      this.peers = response.data
-      return response.data
+      console.log('DELETED response ->', response)
+      if (response.statue === 200 || response.statue === 204) {
+        const filteredPeers = this.peers.filter(item => item.uid !== key)
+        this.peers = filteredPeers
+      } else {
+        this.hasError = true
+        return response.status.concat(response.message)
+      }
     })
     .catch((error) => {
       console.error(error)
@@ -117,8 +89,7 @@ class PeersStore {
 
   @computed
   get peersCount() {
-    // return this.peers.length
-    return Number('7')
+    return this.peers.length
   }
 }
 
