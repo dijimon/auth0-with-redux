@@ -314,7 +314,6 @@ class PeersTable extends Component {
   }
 
   add = (key) => {
-    console.log('In add(), key = ', key)
     this.setState({ editingKey: key+1, isCreating: true })
 
     const { count, dataSource } = this.state
@@ -384,12 +383,9 @@ class PeersTable extends Component {
           if (response.message) {
             this.setState({hasError: true, errMessage: response.message})
           }
-          console.log('IN CREATE, response = ', response)
           const peerWithUrls = this.mergePeersWithItsUrls([response])
-          console.log('NEW PEER:', peerWithUrls)
           const {dataSource: updatedDataSource} = this.state
           updatedDataSource.push(peerWithUrls[0])
-          console.log('updatedDataSource', updatedDataSource)
           this.setState({ dataSource: updatedDataSource, isLoading: false })
         })
         .catch(error => this.setState({ error, isLoading: false }))

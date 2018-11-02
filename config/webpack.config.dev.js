@@ -199,25 +199,6 @@ module.exports = {
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
       "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
     },
-    // proxy: {
-    //   "/api/v1/peers" : {
-    //     "target": "http://localhost:3000",
-    //     "changeOrigin": true
-    //   }
     proxy: 'https://operator.kubernetes.dev.intellecteu.com/api/v1'
-        // proxy: {
-        //   'https://operator.kubernetes.dev.intellecteu.com': {
-        //     target: 'http://localhost:3000',
-        //     // context: () => true
-        //   }
-        // }
-      // },
-      // 'https://operator.kubernetes.dev.intellecteu.com/api/v1*': 'http://localhost:3000'
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:3000',
-    //     pathRewrite: {'^/api' : ''}
-    //   }
-    //   }
   }
 };
