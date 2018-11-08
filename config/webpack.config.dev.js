@@ -133,6 +133,26 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
+          {
+            test: /\.scss$/,
+            use: [
+                {
+                    loader: 'style-loader'
+                },
+                {
+                    loader: 'css-loader',
+                    options: {
+                        modules: 'true'
+                    }
+                },
+                {
+                    loader: 'sass-loader',
+                    options: {
+                        modules: 'true'
+                    }
+                }
+            ]
+        },
         ],
       },
       // ** STOP ** Are you adding a new loader?
@@ -188,17 +208,25 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devServer: {
-    open: true,
-    historyApiFallback: true,
-    watchOptions: { aggregateTimeout: 300, poll: 1000 },
-    hot: true,
-    port: process.env.PORT || 3000,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
-    },
-    proxy: 'https://operator.kubernetes.dev.intellecteu.com/api/v1'
-  }
+  // devServer: {
+  //   inline: true,
+  //   port: 3000,
+  //   hot: true,
+  //   contentBase:"/src/",
+  //   stats: "errors-only"
+  // }
+  // devServer: {
+  //   open: true,
+  //   historyApiFallback: true,
+  //   watchOptions: { aggregateTimeout: 300, poll: 1000 },
+  //   hot: true,
+  //   port: process.env.PORT || 3000,
+  //   headers: {
+  //     "Access-Control-Allow-Origin": "*",
+  //     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+  //     "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+  //   },
+  //   host: 'localhost:3000',
+  //   proxy: 'https://operator.kubernetes.dev.intellecteu.com/api/v1'
+  // }
 };

@@ -1,21 +1,24 @@
-.topButtonContainer {
-    margin-bottom: 16px; 
-    min-width: 150px;
-    /* display: flex;
-    flex-direction: row;
-    display: flex;
-    justify-content: space-between */
+.peersTableContainer .ant-table-body{
+    /* max-height: 300px !important;
+    white-space: nowrap;
+    overflow: hidden; */
 }
-.topButtonContainer .topButton {
-    min-width: 120px;
-    margin: 0 10px 0 0;
+.peersTableContainer {
+    /* background-color: yellow */
 }
 .actionIconContainer:hover {
     cursor: pointer;
 }
+.textCenter {
+    text-align: center !important;
+}
+.totalInfo {
+    z-index: 999;
+    background-color: blueviolet
+}
 .actionIcon {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
 }
 .selectContainer {
    line-height: 20px;
@@ -43,4 +46,27 @@
 .standartStatus {
     color: 'blue';
     font-weight: 700;
+}
+.iconCircle{
+    padding-top: 6px;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    opacity: .7;
+    border-radius: 50%;
+    font-size: 16px;
+    width: 30px;
+    height: 30px;
+}
+.iconCircle:hover {
+    transition: opacity 0.5s linear; 
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    opacity: 1;
+    background-color: white;
+    border-radius: 50%;
+    font-size: 16px;
+    width: 30px;
+    height: 30px;
 }
