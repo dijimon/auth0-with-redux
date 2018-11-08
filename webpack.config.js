@@ -1,4 +1,16 @@
 const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const ReactHotLoader= require('react-hot-loader/babel')
+let pathsToClean = [
+    'dist',
+    'build'
+  ]
+let cleanOptions = {
+  root:     '/full/webpack/root/path',
+  exclude:  ['shared.js'],
+  verbose:  true,
+  dry:      false
+} 
 
 module.exports = {
     mode: 'development',
@@ -26,6 +38,7 @@ module.exports = {
       path: path.resolve(__dirname, 'dist')
     },
     plugins: [
+        new ReactHotLoader(),
         new webpack.HotModuleReplacementPlugin(),
         new ExtractTextPlugin('style.css'),
         new webpack.DllReferencePlugin({
@@ -34,6 +47,7 @@ module.exports = {
         }),
         new webpack.LoaderOptionsPlugin({
             debug: true
-        })
+        }),
+        new CleanWebpackPlugin(pathsToClean,cleanOptions)
     ]
 };
