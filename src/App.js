@@ -8,8 +8,8 @@ import Grid from './Components/Grid/index.js'
 import * as ENDPOINTS from './endpoints.js'
 
 class App extends Component {
-    componentDidMount = async () => {
-        let sseSource = await new EventSource(ENDPOINTS.sseURL, { withCredentials: false })
+    componentDidMount = () => {
+        let sseSource = new EventSource(ENDPOINTS.sseURL, { withCredentials: false })
         let myReadyState = sseSource.readyState
         console.log(`Begin myReadyState = ${myReadyState}`)
 
