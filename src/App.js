@@ -14,14 +14,14 @@ class App extends Component {
         console.log(`Begin myReadyState = ${myReadyState}`)
 
         sseSource.onmessage = (e) => {
-           console.log(`message: ${e.data}`)
+           console.log(`Onmessage, message: ${e.data}, myReadyState: ${myReadyState}`)
         }
 
         sseSource.onerror = (e) => {
-            let evt = e || event
+            // let evt = e || event
             let msg = ''
-            console.log(`!!! evt.target.readyState = ${evt.target.readyState}`)
-            switch( evt.target.readyState ){
+            console.log(`e.target.readyState = ${e.target.readyState}`)
+            switch( e.target.readyState ){
                 case EventSource.CONNECTING:
                     msg = 'Reconnecting…'
                     break
@@ -33,11 +33,11 @@ class App extends Component {
                     msg = 'Connection is opened'
                     break
             }
-            console.log(`Error: ${msg}`)
+            console.log(`Onerror, message: ${msg}, myReadyState: ${myReadyState}`)
         }
 
         sseSource.onopen = (e) => {
-            console.log(`Open message: ${e.target.value}, myReadyState: ${myReadyState}`)
+            console.log(`Onopen, message: ${e.target.value}, myReadyState: ${myReadyState}`)
         }
     }
 
