@@ -42,24 +42,23 @@ class PeersStore {
 
   @action
   updatePeer = (peer, key) => {
-
     console.log('In updatePeer, newInfo = ', peer, key)
     console.log('!! key = ', key)
     const url = `${ENDPOINTS.baseURL}${ENDPOINTS.peers}/${key}`
     return axios.put(url, {'name': peer['name'], 'channels': peer['channels']})
     .then((response) => {
       console.log('UPDATE PEER response ->', response)
-      this.peers.push(response.data)
-      // if(response.status === 200 || response.status === 201) {
+      if(response.status === 200 || response.status === 204) {
         this.peers.push(response.data)
         return response.data
-      // } else {
-      //   this.hasError = true
-      //   return response.status.concat(response.message)
-      // }
+      } else {
+        this.hasError = true
+        return response
+      }
     })
     .catch((error) => {
-      console.error(error)
+      console.log(error)
+      return error
     })
     
   }
@@ -75,7 +74,7 @@ class PeersStore {
         this.peers = filteredPeers
       } else {
         this.hasError = true
-        return response.status.concat(response.message)
+        return response.message
       }
     })
     .catch((error) => {

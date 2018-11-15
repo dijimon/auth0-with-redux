@@ -28,12 +28,12 @@ instance.interceptors.request.use((config) => {
   return Promise.reject(error)
 })
 
-instance.interceptors.response.use((response) => {
-  console.log('Response: ', response)
-  return response
-}, (error) => {
-  console.log('Response error:', error)
-  return Promise.reject(error)
+instance.interceptors.response.use(
+  (response) => {return response},
+  (error) => {
+  //if (error.response.status === 500) {
+    console.log(`Server responded with status ${error.response.status}. Error text: ${error.response.data.message}`)
+  return Promise.reject(error.response)
 })
 
 export default instance

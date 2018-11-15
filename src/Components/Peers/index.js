@@ -1,10 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import { Card, Table, Input, Popconfirm, Form, Button, Icon, Tooltip, Badge, Select } from 'antd'
+import { Card, Table, Input, Popconfirm, Form, Button, Icon, Tooltip, Badge, Select, Alert } from 'antd'
 // import Select from 'react-select'
 import { inject, observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 import './styles.css'
-// import './styles.scss';
 
 export default class Peers extends Component {
 
@@ -63,7 +62,8 @@ class EditableCell extends Component {
     // }
 
     if (this.props.dataIndex === 'name') {
-      return <Input placeholder='Input name...' onChange={this.handleNameChanging()} />
+      return <Input placeholder='Input name...' />
+      // onChange={this.handleNameChanging()}
     } 
     else return <Input className='disabledInput' disabled />
   }
@@ -108,6 +108,7 @@ class EditableCell extends Component {
                 dataIndex !== 'channels' ?
                 (dataIndex === 'name' ? <FormItem>
                   {getFieldDecorator(dataIndex, {
+                    initialValue: restProps.children[2],
                     rules: [
                       {required: true, message: 'Please input Peer name'},
                       {pattern: /^[a-z0-9]{1,255}$/, message: 'Only alphanumeric lowercase'}
@@ -118,18 +119,11 @@ class EditableCell extends Component {
                 </FormItem> : this.getInput())
                 : <FormItem>
                   {getFieldDecorator(dataIndex, {
+                    // initialValue:  restProps.children[2],
                     rules: [
                       {required: true, message: 'Please select Channels'}
                     ]
                   })(
-                      // <Select
-                      //   className='selectContainer'
-                      //   onChange={this.handleChannelsChange}
-                      //   options={options}
-                      //   placeholder={'Select Сhannel(s)'}
-                      //   isMulti
-                      //   isSearchable
-                      // />
                       <Select
                         mode='multiple'
                         style={{ width: '100%' }}
@@ -165,8 +159,10 @@ class PeersTable extends Component {
       isLoading: false,
       selectedChannelOption: null,
       channels: [],
-      errMessage: '',
-      sortedInfo: null,
+      isError: false,
+      isInfo: false,
+      errorMessage: '',
+      infoMessage: '',
       pagination: null,
       current: 0,
     }
@@ -175,13 +171,8 @@ class PeersTable extends Component {
   }
 
   componentDidMount = async () => {
-    const defaultSortedInfo = {
-      order: "ascend",
-      columnKey: "test"
-    }
-    this.setState({ isLoading: true, sortedInfo: defaultSortedInfo })
-    let {sortedInfo} = this.state
-    sortedInfo = sortedInfo || {}
+    
+    this.setState({ isLoading: true })
     
     this.columns = [{
       key: 'name',
@@ -189,17 +180,14 @@ class PeersTable extends Component {
       dataIndex: 'name',
       className: 'textCenter',
       width: '20%',
-      editable: true,
-      // defaultSortOrder: 'ascend',
-      sorter: (a, b) => a.name - b.name
+      editable: true
     },
     {
       title: 'URL',
       dataIndex: 'url',
       className: 'textCenter',
       width: '20%',
-      editable: true,
-      sorter: (a, b) => a.url - b.url
+      editable: true
     },
     {
       title: 'Channels',
@@ -208,6 +196,20 @@ class PeersTable extends Component {
       width: '20%',
       editable: true,
     },
+    // {
+    //   title: 'Created',
+    //   dataIndex: 'created_at',
+    //   className: 'textCenter',
+    //   width: '20%',
+    //   editable: true,
+    // },
+    // {
+    //   title: 'Started',
+    //   dataIndex: 'status.startTime',
+    //   className: 'textCenter',
+    //   width: '20%',
+    //   editable: true,
+    // },
     {
       title: 'Status',
       dataIndex: 'status.phase',
@@ -215,7 +217,6 @@ class PeersTable extends Component {
       width: '15%',
       editable: true,
       key: 'status.phase',
-      sorter: (a, b) => a.status - b.status,
       render: (status) => {
         const statusText = status ? status : 'Not running'
         const statusColor =  status && status.toLowerCase() === 'running' ? '#5BC62E' 
@@ -241,7 +242,7 @@ class PeersTable extends Component {
       }
     },
     {
-      title: 'Action',
+      title: 'Actions',
       dataIndex: 'action',
       className: 'textCenter',
       width: '15%',
@@ -262,7 +263,7 @@ class PeersTable extends Component {
                       onClick={() => this.save(form, record.key)}
                       style={{ margin: '0 auto' }}
                     >
-                      <Icon className='actionIcon' type='check' />
+                      <Icon className='actionIcon iconCircle' type='check' />
                     </a>
                   </Tooltip>
                     ) :
@@ -281,6 +282,7 @@ class PeersTable extends Component {
                 {
                   <Popconfirm
                   title='Sure to cancel?'
+                  icon={<Icon type="question-circle-o" style={{ color: 'red' }}/>}
                   onConfirm={() => this.cancel(record.key)}
                 >
                   <Tooltip className='actionIcon' placement='top' title='Cancel'>
@@ -458,6 +460,12 @@ class PeersTable extends Component {
     }
   }
 
+  handleMessageShowing = () => {
+    setTimeout(() => {
+      this.setState({isError: false, isInfo: false, errorMessage: '', infoMessage: ''})
+    }, 3000)
+  }
+
   save(form, key) {
     form.validateFields((error, row, key) => {
       if (error) {
@@ -467,16 +475,39 @@ class PeersTable extends Component {
       const {editingKey} = this.state
       // this.handleNewData(row, key)
       this.props.PeersStore.updatePeer(row, editingKey)
-      .then(() => {
-        this.props.PeersStore.getPeers()
-        .then((response) => { 
-          const peerWithUrls = this.mergePeersWithItsUrls(response)
-          this.setState({ dataSource: peerWithUrls, isLoading: false, editingKey: -1})
-        })
+      .then((response) => {
+
+        console.log('### response = ')
+        if ((response.status !== 200 && response.status !== 204) && response.data) {
+          // show error; return 0;
+          console.log('!!! response = ', response.data.message)
+          this.setState({ isError: true, errorMessage: response.data.message, isLoading: false })
+          this.handleMessageShowing()
+        } else if (response.status === 200 || response.status === 204) {
+          this.setState({ isSuccess: true, infoMessage: 'Peer has successfully updated', isLoading: false })
+          this.handleMessageShowing()
+        }
       })
-      .catch(error => this.setState({ error, isLoading: false }))
+      .catch(error => {
+        console.log('ERROR: ', error)
+        this.setState({ isError: true, errorMessage: error, isLoading: false })
+      })
+      
+      this.props.PeersStore.getPeers()
+      .then((response) => { 
+        const peerWithUrls = this.mergePeersWithItsUrls(response)
+        this.setState({ dataSource: peerWithUrls, isLoading: false, editingKey: -1})
+      })
+      .catch(error => {
+        console.log('ERROR: ', error)
+        this.setState({ error, isLoading: false })
+      })
     })
     // e.target.reset()
+    const {isError, errorText} = this.state
+    if (isError) {
+      console.log('!!! ERROR: errorText', errorText)
+    }
   }
 
   create = (form, key) => {
@@ -490,24 +521,24 @@ class PeersTable extends Component {
       this.setState({ isCreating: false, isLoading: true, dataSource: ds})
       this.props.PeersStore.addPeer(row)
         .then((response) => {
-          if (!response) response = []
-          if (response.message) {
-            this.setState({hasError: true, errMessage: response.message})
-          }
+          // if (!response) response = []
+          if (!response && (response.status !== 200 || response.status !== 201)) {
+            this.setState({isError: true, errorMessage: response.data.message})
+          } else {
           const peerWithUrls = this.mergePeersWithItsUrls([response])
           const {dataSource: updatedDataSource} = this.state
           updatedDataSource.push(peerWithUrls[0])
           this.setState({ dataSource: updatedDataSource, isLoading: false })
+          this.setState({ isInfo: true, infoMessage: 'Peer created successfuly' })
+          this.handleMessageShowing()
+          }
         })
         .catch(error => this.setState({ error, isLoading: false }))
     })
-    // e.target.reset()
-    const table = document.getElementsByClassName('ant-table-content')[0]
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
   })
-    // this.scrollTableTo('header')
   }
 
   cancel = () => {
@@ -541,48 +572,49 @@ class PeersTable extends Component {
     })
 
     const nextPeer = this.state.dataSource ? this.state.dataSource.length : 0
-    let { sortedInfo } = this.state
-    sortedInfo = sortedInfo || {}
+    let { isError, isInfo, errorMessage, infoMessage } = this.state
     const ButtonGroup = Button.Group
 
     return (
         <Fragment>
-        <div className='topButtonContainer'>
-        <Tooltip placement='top' title='Peers amount'>
-        <Badge className='totalInfo' style={{backgroundColor: '#001529', zIndex: 999}} count={this.state.dataSource.length}>
-            <a href='#' />
-          </Badge></Tooltip>
-          <ButtonGroup>
-            <Button
-              disabled={this.state.isCreating}
-              type='primary' 
-              onClick={() => this.reloadPeers()}>
-              <Icon type='reload' />Reload
-            </Button>
-            <Button
-              disabled={this.state.isCreating}
-              type='primary'
-              onClick={() => this.add(nextPeer)}>
-              Add Peer<Icon type='plus' />
-            </Button>
-          </ButtonGroup>
-          <span style={{color: 'red'}} id='errorMessage'>{this.state.errMessage}</span>
-        </div>
-      <Table
-        className='peersTableContainer'
-        components={components}
-        // size='small'
-        bordered
-        dataSource={this.state.dataSource}
-        rowKey='uid'
-        columns={columns}
-        rowClassName='editable-row'
-        loading={this.state.isLoading}
-        onChange={this.handleTableChange}
-        // scroll={{ y: 500 }}
-        pagination={this.state.pagination}
-      />
-      </Fragment>
+          <div className='topButtonContainer' style={{display: 'flex', justifyContent: 'spaceBetween', minHeight: 40}}>
+            <Tooltip placement='top' title='Peers amount'>
+              <Badge className='totalInfo' style={{backgroundColor: '#001529', zIndex: 999}} count={this.state.dataSource.length || '0'}>
+                <a href='#' />
+              </Badge>
+            </Tooltip>
+            <ButtonGroup>
+              <Button
+                disabled={this.state.isCreating}
+                type='primary' 
+                onClick={() => this.reloadPeers()}>
+                <Icon type='reload' />Reload
+              </Button>
+              <Button
+                disabled={this.state.isCreating}
+                type='primary'
+                onClick={() => this.add(nextPeer)}>
+                Add Peer<Icon type='plus' />
+              </Button>
+            </ButtonGroup>
+            {isError && <Alert id="errorMessage" style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message={errorMessage} type="error" showIcon />}
+            {isInfo && <Alert id="infoMessage" style={{marginLeft: 20, opacity: 1, transition: 'opacity 0.2s 1s ease' }} message={infoMessage} type="success" showIcon />}
+          </div>
+          <Table
+            className='peersTableContainer'
+            components={components}
+            // size='small'
+            bordered
+            dataSource={this.state.dataSource}
+            rowKey='uid'
+            columns={columns}
+            rowClassName='editable-row'
+            loading={this.state.isLoading}
+            onChange={this.handleTableChange}
+            // scroll={{ y: 500 }}
+            pagination={this.state.pagination}
+          />
+        </Fragment>
     )
   }
 }

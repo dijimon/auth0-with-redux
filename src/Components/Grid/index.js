@@ -12,6 +12,7 @@ import Chaincodes from './../Chaincodes/index.js'
 import Settings from './../Settings/index.js';
 import TheMenu from './../TheMenu/index.js';
 import Home from './../Home/index.js';
+import Dashboard from './../Dashboard/index.js';
 import logo from './../../assets/logo.png'
 import './styles.css'
 
@@ -110,6 +111,7 @@ class Grid extends Component {
                 <Content style={{ margin: '5px' }}>
                   <Switch>
                     <Route exact path="/" component={Home} />
+                    <Route path="/dashboard" component={Dashboard} />
                     <Route path="/orderers" component={Orderers} />
                     <Route path="/peers" component={Peers} />
                     <Route path="/cas" component={CAs} />
