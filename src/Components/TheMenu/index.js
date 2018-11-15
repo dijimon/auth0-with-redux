@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Menu, Icon } from 'antd'
 import PropTypes from 'prop-types'
 import { NavLink } from 'react-router-dom'
-
 class TheMenu extends Component {
     static propTypes = {
       history: PropTypes.shape({
@@ -94,6 +93,11 @@ class TheMenu extends Component {
                 <Icon type="setting" />
                 <span>Settings</span>
                 <NavLink to={`/settings`} className={'navLink'} activeClassName={'active'} />
+              </Menu.Item>
+              <Menu.Item key="7">
+                <Icon type="bar-chart" />
+                <span>Dashboards</span>
+                <NavLink to={`/dashboard`} className={'navLink'} activeClassName={'active'} />
               </Menu.Item>
             </Menu>
         );
