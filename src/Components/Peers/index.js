@@ -594,7 +594,7 @@ class PeersTable extends Component {
                 disabled={this.state.isCreating}
                 type='primary'
                 onClick={() => this.add(nextPeer)}>
-                Add Peer<Icon type='plus' />
+                Add Peer!!<Icon type='plus' />
               </Button>
             </ButtonGroup>
             {isError && <Alert id="errorMessage" style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message={errorMessage} type="error" showIcon />}
