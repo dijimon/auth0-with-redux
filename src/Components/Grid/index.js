@@ -24,10 +24,13 @@ class Grid extends Component {
     constructor (props) {
       super(props)
 
+      this._handleOrgNameChanging = this.handleOrgNameChanging.bind(this)
+
       this.state = {
         collapsed: this.getFromLS('collapsed') || false,
         theme: this.getFromLS('theme') || 'dark',
-        current: 4
+        current: 4,
+        title: 'Catalyst Platform'
       }
     }
 
@@ -35,6 +38,15 @@ class Grid extends Component {
       history: PropTypes.shape({
         push: PropTypes.func.isRequired,
       })
+    }
+
+    componentDidMount = () => {
+      this.getOrgName()
+    }
+
+    componentUnmount = () => {
+      console.log('In componentWillUnmount  ^^^^^^^^^^^^^^^^^^^^')
+      this.handleOrgNameChanging = null
     }
 
     onCollapse = (collapsed) => {
@@ -51,9 +63,11 @@ class Grid extends Component {
     }
 
     getOrgName = () => {
-      const orgName = this.props.SettingsStore.settings.orgName
-      const orgNameFromLS = window.localStorage.getItem('orgName')
-      return orgName ? orgName : (orgNameFromLS ? orgNameFromLS : 'Catalyst Fabric')
+      let orgName = ''
+      this.props.SettingsStore.getSettings().then(() => {
+        orgName = this.props.SettingsStore.settings.name
+        this.setState({title: orgName})
+      })
     }
 
     setToLS = (key, value) => {
@@ -71,8 +85,16 @@ class Grid extends Component {
       this.props.history.push(`/`)
     }
 
+    handleOrgNameChanging = (newValue) => {
+      if (newValue && this.title !== newValue) {
+        console.log(`NEWVALUE = ${newValue}`)
+        this.setState({title: newValue})
+      }
+    }
+
     render() {
-        const orgName = this.getOrgName()
+        const orgName = this.state.title // this.getOrgName()
+        // const orgName = this.props.SettingsStore.settings ? this.props.SettingsStore.settings.name : 'Catalyst Platform'
 
         return (
             <Layout className="rootContainer">
@@ -117,7 +139,7 @@ class Grid extends Component {
                     <Route path="/cas" component={CAs} />
                     <Route path="/channels" component={Channels} />
                     <Route path="/chaincodes" component={Chaincodes} />
-                    <Route path="/settings" component={Settings} />
+                    <Route path="/settings" component={() => <Settings handleOrgNameChanging={this._handleOrgNameChanging} />}/>
                     <Redirect from='*' to='/' />
                   </Switch>
                 </Content>
