@@ -11,12 +11,13 @@ import Channels from './../Channels/index.js'
 import Chaincodes from './../Chaincodes/index.js'
 import Settings from './../Settings/index.js';
 import TheMenu from './../TheMenu/index.js';
+import TheHeader from './../TheHeader/index.js';
 import Home from './../Home/index.js';
 import Dashboard from './../Dashboard/index.js';
 import logo from './../../assets/logo.png'
 import './styles.css'
 
-const { Header, Content, Footer, Sider } = Layout
+const { Content, Footer, Sider } = Layout
 @inject('SettingsStore')
 @observer
 @withRouter
@@ -50,12 +51,6 @@ class Grid extends Component {
       });
     }
 
-    getOrgName = () => {
-      const orgName = this.props.SettingsStore.settings.orgName
-      const orgNameFromLS = window.localStorage.getItem('orgName')
-      return orgName ? orgName : (orgNameFromLS ? orgNameFromLS : 'Catalyst Fabric')
-    }
-
     setToLS = (key, value) => {
       const currentSettings = JSON.parse(window.localStorage.getItem('settings')) || {}
       currentSettings[key] = value
@@ -71,8 +66,7 @@ class Grid extends Component {
       this.props.history.push(`/`)
     }
 
-    render() {
-        const orgName = this.getOrgName()
+    render () {
 
         return (
             <Layout className="rootContainer">
@@ -103,11 +97,7 @@ class Grid extends Component {
                     <div style={{margin: 10}} className={this.state.theme === 'dark' ? 'menuOptionsDark' : 'menuOptionsLight'}></div>
                 </Sider>
                 <Layout>
-                <Header className="mainHeader" style={{ background: '#fff', padding: 0 }}>
-                  <div style={{ background: '#fff', paddingLeft: 50, margin: 'auto' }}>
-                    {orgName}
-                  </div>
-                </Header>
+                <TheHeader />
                 <Content style={{ margin: '5px' }}>
                   <Switch>
                     <Route exact path="/" component={Home} />
@@ -117,7 +107,7 @@ class Grid extends Component {
                     <Route path="/cas" component={CAs} />
                     <Route path="/channels" component={Channels} />
                     <Route path="/chaincodes" component={Chaincodes} />
-                    <Route path="/settings" component={Settings} />
+                    <Route path="/settings" component={Settings}/>
                     <Redirect from='*' to='/' />
                   </Switch>
                 </Content>
