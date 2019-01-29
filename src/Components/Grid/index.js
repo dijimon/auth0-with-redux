@@ -11,12 +11,13 @@ import Channels from './../Channels/index.js'
 import Chaincodes from './../Chaincodes/index.js'
 import Settings from './../Settings/index.js';
 import TheMenu from './../TheMenu/index.js';
+import TheHeader from './../TheHeader/index.js';
 import Home from './../Home/index.js';
 import Dashboard from './../Dashboard/index.js';
 import logo from './../../assets/logo.png'
 import './styles.css'
 
-const { Header, Content, Footer, Sider } = Layout
+const { Content, Footer, Sider } = Layout
 @inject('SettingsStore')
 @observer
 @withRouter
@@ -24,13 +25,10 @@ class Grid extends Component {
     constructor (props) {
       super(props)
 
-      this._handleOrgNameChanging = this.handleOrgNameChanging.bind(this)
-
       this.state = {
         collapsed: this.getFromLS('collapsed') || false,
         theme: this.getFromLS('theme') || 'dark',
-        current: 4,
-        title: 'Catalyst Platform'
+        current: 4
       }
     }
 
@@ -38,15 +36,6 @@ class Grid extends Component {
       history: PropTypes.shape({
         push: PropTypes.func.isRequired,
       })
-    }
-
-    componentDidMount = () => {
-      this.getOrgName()
-    }
-
-    componentUnmount = () => {
-      console.log('In componentWillUnmount  ^^^^^^^^^^^^^^^^^^^^')
-      this.handleOrgNameChanging = null
     }
 
     onCollapse = (collapsed) => {
@@ -60,14 +49,6 @@ class Grid extends Component {
       this.setState({ theme: theme}, () => {
         this.setToLS('theme', theme)
       });
-    }
-
-    getOrgName = () => {
-      let orgName = ''
-      this.props.SettingsStore.getSettings().then(() => {
-        orgName = this.props.SettingsStore.settings.name
-        this.setState({title: orgName})
-      })
     }
 
     setToLS = (key, value) => {
@@ -85,16 +66,7 @@ class Grid extends Component {
       this.props.history.push(`/`)
     }
 
-    handleOrgNameChanging = (newValue) => {
-      if (newValue && this.title !== newValue) {
-        console.log(`NEWVALUE = ${newValue}`)
-        this.setState({title: newValue})
-      }
-    }
-
-    render() {
-        const orgName = this.state.title // this.getOrgName()
-        // const orgName = this.props.SettingsStore.settings ? this.props.SettingsStore.settings.name : 'Catalyst Platform'
+    render () {
 
         return (
             <Layout className="rootContainer">
@@ -125,11 +97,7 @@ class Grid extends Component {
                     <div style={{margin: 10}} className={this.state.theme === 'dark' ? 'menuOptionsDark' : 'menuOptionsLight'}></div>
                 </Sider>
                 <Layout>
-                <Header className="mainHeader" style={{ background: '#fff', padding: 0 }}>
-                  <div style={{ background: '#fff', paddingLeft: 50, margin: 'auto' }}>
-                    {orgName}
-                  </div>
-                </Header>
+                <TheHeader />
                 <Content style={{ margin: '5px' }}>
                   <Switch>
                     <Route exact path="/" component={Home} />
@@ -139,7 +107,7 @@ class Grid extends Component {
                     <Route path="/cas" component={CAs} />
                     <Route path="/channels" component={Channels} />
                     <Route path="/chaincodes" component={Chaincodes} />
-                    <Route path="/settings" component={() => <Settings handleOrgNameChanging={this._handleOrgNameChanging} />}/>
+                    <Route path="/settings" component={Settings}/>
                     <Redirect from='*' to='/' />
                   </Switch>
                 </Content>
