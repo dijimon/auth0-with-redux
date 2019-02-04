@@ -63,13 +63,12 @@ class Settings extends Component {
   getSettings = async () => {
     await this.props.SettingsStore.getSettings()
     const settings = this.props.SettingsStore.settings
-    this.setState({settings})
-    console.log(`CURRENT SETTINGS: ${Object.values(settings)}`)
+    this.state.settings ? this.setState({settings}) : this.setState({settings: {}})
   }
 
   handleSubmit = async (e) => {
     e.preventDefault()
-    const errorMessage = 'Something is wrong...'
+    const errorMessage = 'Something went wrong...'
     const successMessage = 'Changes are saved'
 
     await this.props.form.validateFields((err, values) => {
@@ -77,9 +76,8 @@ class Settings extends Component {
         this.setState({isError: true, message: errorMessage})
       } else {
         this.props.SettingsStore.setSettings(values).then((reponse) => {
-          if(reponse.status === 400 && reponse.data) {
+          if(reponse.status !== 201 && reponse.data) {
             this.setState({isError: true, message: reponse.data.message})
-            this.getSettings()
           } else {
             this.setState({isSuccess: true, message: successMessage})
           }
@@ -88,7 +86,11 @@ class Settings extends Component {
     })
     await setTimeout(() => {
       this.setState({ isSuccess: false, isError: false, message: '', isDisabled: true })
-    }, 4000)
+    }, 5000)
+  }
+
+  handleCancel = () => {
+    this.setState({isDisabled: true})
   }
 
   handleEdit = () => {
@@ -102,21 +104,23 @@ class Settings extends Component {
   render() {
     const formItemLayout = {
       labelCol: { span: 4 },
-      wrapperCol: { span: 14 }
+      wrapperCol: { span: 14 },
+      colon: false
     }
     const buttonItemLayout = {
-      wrapperCol: { span: 14, offset: 4 }
+      wrapperCol: { span:14, offset: 4 }
     }
     const ExpImpButtonItemLayout = {
       wrapperCol: { span: 24, offset: 4 }
     }
     const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
     const { isDisabled, message, isSuccess, isError, formLayout } = this.state
-    const organizationNamePlaceholder = this.getOrgName() !== '' ? this.getOrgName() : 'Enter organization name'
-    const domainPlaceholder = this.getDomain() !== '' ? this.getDomain() : 'Enter domain'
+    const orgName = this.getOrgName()
+    const domain = this.getDomain()
     const messageAlert = <Alert type = {isError ? 'error' : (isSuccess ? 'success' : 'info')} className = 'alertHideAnimation' message = { message || ''} />
     const orgNameError = isFieldTouched('name') && getFieldError('name')
     const domainError = isFieldTouched('domain') && getFieldError('domain')
+    const isSettingsWereSet = this.props.SettingsStore.isSettingsWereSet
 
     return (
       <Card title="Settings">
@@ -138,18 +142,18 @@ class Settings extends Component {
               },
               {
                 whitespace: true,
-                message: 'Organization name should not contain whitespaces.'
+                message: 'Organization name should not contain whitespaces'
               },
               {
                 pattern: /^[a-z0-9]{1,255}}?$/,
                 message: 'Alphanumerical lowercase no more than 255 symbols',
               }],
-              initialValue: organizationNamePlaceholder || ''
+              initialValue: orgName || ''
             })(
               <Input 
-                placeholder = {organizationNamePlaceholder} 
+                placeholder = 'Enter organization name' 
                 addonAfter = {<Icon type="star" />} 
-                disabled = {isDisabled}
+                disabled = {isSettingsWereSet ? isDisabled : false}
               />
             )}
           </Form.Item>
@@ -166,20 +170,20 @@ class Settings extends Component {
                     message: 'Please input domain',
                   },
                   {
-                    pattern: /^[a-zA-Z0-9][-a-zA-Z0-9]+[a-zA-Z0-9].[a-z]{2,6}(.[a-z]{2,6})?(.[a-z]{2,6})?$/,
-                    message: 'Not allowed Domain name.',
+                    pattern: /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/,
+                    message: 'Not allowed Domain name',
                   }
                 ],
-                initialValue: domainPlaceholder || ''
+                initialValue: domain || ''
             })(
               <Input 
-                placeholder = {domainPlaceholder}
+                placeholder = 'Enter domain'
                 addonAfter = {<Icon type="global" />}
-                disabled = {isDisabled}
+                disabled = {isSettingsWereSet ? isDisabled : false}
               />
             )}
           </Form.Item>
-            <Form.Item {...ExpImpButtonItemLayout}>
+            <Form.Item {...ExpImpButtonItemLayout} style={{marginBottom: 0}}>
             <Button.Group>
               <Button ghost type="primary" icon="cloud">Export Crypto</Button>
               <Upload {...props}>
@@ -187,10 +191,11 @@ class Settings extends Component {
               </Upload>
             </Button.Group>
           </Form.Item>
-            <Form.Item {...buttonItemLayout}>
-              <Button type='primary' style={{'marginRight':'10px'}} disabled={!isDisabled} onClick={this.handleEdit}>Edit</Button>
-              <Button type='primary' htmlType="submit" disabled={this.hasErrors(getFieldsError()) || isDisabled} onClick={this.handleSubmit}>Save</Button>
-            </Form.Item>
+          <Form.Item {...buttonItemLayout}>
+            {(isDisabled && isSettingsWereSet) && <Button type='primary' style={{'marginRight':'10px'}} onClick={this.handleEdit}>Edit</Button>}
+            {(!isDisabled || !isSettingsWereSet) && <Button type='primary' style={{'marginRight':'10px'}} disabled={isDisabled} onClick={this.handleCancel}>Cancel</Button>}
+            {(!isDisabled || !isSettingsWereSet) && <Button type='primary' htmlType="submit" disabled={this.hasErrors(getFieldsError())} onClick={this.handleSubmit}>Save</Button>}
+          </Form.Item>
 
           </Form>
         </div>

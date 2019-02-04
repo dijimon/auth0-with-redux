@@ -1,0 +1,1 @@
+export const DEFAULT_PLATFORM_NAME = 'Catalyst Platform'

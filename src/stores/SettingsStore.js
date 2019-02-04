@@ -1,6 +1,7 @@
 import { observable, action, computed } from 'mobx';
 import axios from './../services/axios'
 import * as ENDPOINTS from './../endpoints'
+import { DEFAULT_PLATFORM_NAME } from './../constants'
 
 const axiosConfig = {
   headers: {
@@ -13,11 +14,15 @@ class SettingsStore {
   @observable settings
 
   @computed get name() {
-    return this.settings ? this.settings.name : ''
+    return this.settings ? this.settings.name : DEFAULT_PLATFORM_NAME
   }
 
   @computed get domain() {
     return this.settings ? this.settings.domain : ''
+  }
+
+  @computed get isSettingsWereSet() {
+    return this.settings && this.settings.name && this.settings.domain ? true : false
   }
 
   @action
