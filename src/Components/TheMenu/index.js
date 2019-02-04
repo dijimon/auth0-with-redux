@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import { Menu, Icon } from 'antd'
 import PropTypes from 'prop-types'
 import { NavLink } from 'react-router-dom'
+import { inject, observer } from 'mobx-react';
+
+@inject('SettingsStore')
+@observer
 class TheMenu extends Component {
     static propTypes = {
       history: PropTypes.shape({
@@ -16,6 +20,7 @@ class TheMenu extends Component {
         collapsed: false,
         theme: this.props.theme,
         current: '1',
+        isSettingsWereSet: true
       }
     }
 
@@ -26,7 +31,6 @@ class TheMenu extends Component {
         current: current
       });
     }
-    
     toggleCollapsed = () => {
       this.setState({
         collapsed: !this.state.collapsed,
@@ -53,7 +57,9 @@ class TheMenu extends Component {
     }
 
     render() {
-        return (
+      const isSettingsWereSet = this.props.SettingsStore.isSettingsWereSet
+
+      return (
           <Menu
               defaultSelectedKeys={['0']}
               mode="inline"
@@ -64,27 +70,27 @@ class TheMenu extends Component {
               onClick={this.props.handleMenuClick}
               onChange={this.props.handleMenuClick}
             >
-              <Menu.Item key="1">
+              <Menu.Item key="1" disabled={!isSettingsWereSet}>
                 <Icon type="radar-chart" />
                 <span>Peers</span>
                 <NavLink exact to="/peers" />
               </Menu.Item>
-              <Menu.Item key="2">
+              <Menu.Item key="2" disabled={!isSettingsWereSet}>
                 <Icon type="team" />
                 <span>Orderers</span>
                 <NavLink to="/orderers" />
               </Menu.Item>
-              <Menu.Item key="3">
+              <Menu.Item key="3" disabled={!isSettingsWereSet}>
                 <Icon type="file-done" />
                 <span>CAs</span>
                 <NavLink to="/cas" />
               </Menu.Item>
-              <Menu.Item key="4">
+              <Menu.Item key="4" disabled={!isSettingsWereSet}>
                 <Icon type="block" />
                 <span>Channels</span>
                 <NavLink to="/channels" />
               </Menu.Item>
-              <Menu.Item key="5">
+              <Menu.Item key="5" disabled={!isSettingsWereSet}>
                 <Icon type="branches" />
                 <span>Chaincodes</span>
                 <NavLink to="/chaincodes" />
@@ -94,7 +100,7 @@ class TheMenu extends Component {
                 <span>Settings</span>
                 <NavLink to={`/settings`} className={'navLink'} activeClassName={'active'} />
               </Menu.Item>
-              <Menu.Item key="7">
+              <Menu.Item key="7" disabled={!isSettingsWereSet}>
                 <Icon type="bar-chart" />
                 <span>Dashboards</span>
                 <NavLink to={`/dashboard`} className={'navLink'} activeClassName={'active'} />

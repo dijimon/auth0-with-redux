@@ -1,7 +1,7 @@
 .alertHideAnimation {
     margin-bottom: 20;
     transition: 'opacity 2s linear';
-    animation: opacityToggle 4s;
+    animation: opacityToggle 5s;
  }
  @keyframes opacityToggle{
     0%{
@@ -19,4 +19,9 @@
 }
 span .editIcon:hover {
     color: #1890FF
+}
+input[type="text"]:disabled {
+    background-color: #fff;
+    color: #595959;
+    cursor: default;
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Layout } from 'antd'
 import PropTypes from 'prop-types'
+import { DEFAULT_PLATFORM_NAME } from './../../constants'
 
 const { Header } = Layout
 
@@ -12,7 +13,7 @@ class TheHeader extends Component {
       super(props)
 
       this.state = {
-        title: 'Catalyst Platform'
+        title: DEFAULT_PLATFORM_NAME
       }
     }
 
@@ -34,7 +35,7 @@ class TheHeader extends Component {
     }
 
     render() {
-        const orgName = this.props.SettingsStore.name || ''
+        const orgName = this.props.SettingsStore.name || DEFAULT_PLATFORM_NAME
 
         return (
             <Layout>
