@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Layout } from 'antd'
 import PropTypes from 'prop-types'
@@ -38,13 +38,13 @@ class TheHeader extends Component {
         const orgName = this.props.SettingsStore.name || DEFAULT_PLATFORM_NAME
 
         return (
-            <Layout>
-                <Header className="mainHeader" style={{ background: '#fff', padding: 0 }}>
+                <Fragment>
+                <Header className="mainHeader" style={{ background: 'magenta', padding: 0 }}>
                   <div style={{ background: '#fff', paddingLeft: 50, margin: 'auto' }}>
                     {orgName}
                   </div>
                 </Header>
-          </Layout>
+                </Fragment>
         );
     }
 }

@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Card, Table, Input, Popconfirm, Form, Button, Icon, Tooltip, Badge, Select, Alert } from 'antd'
+import { Card, Table, Input, Popconfirm, Form, Button, Icon, Tooltip, Badge, Select, Alert, Row, Col } from 'antd'
 // import Select from 'react-select'
 import { inject, observer } from 'mobx-react'
 import PropTypes from 'prop-types'
@@ -119,7 +119,6 @@ class EditableCell extends Component {
                 </FormItem> : this.getInput())
                 : <FormItem>
                   {getFieldDecorator(dataIndex, {
-                    // initialValue:  restProps.children[2],
                     rules: [
                       {required: true, message: 'Please select Channels'}
                     ]
@@ -144,6 +143,7 @@ class EditableCell extends Component {
 }
 @inject('PeersStore')
 @inject('SettingsStore')
+@inject('ServerEventsStore')
 @observer
 class PeersTable extends Component {
   constructor(props) {
@@ -161,10 +161,11 @@ class PeersTable extends Component {
       channels: [],
       isError: false,
       isInfo: false,
-      errorMessage: '',
-      infoMessage: '',
+      isSuccess: false,
+      message: '',
       pagination: null,
       current: 0,
+      domain: ''
     }
 
     this.columns = []
@@ -173,7 +174,7 @@ class PeersTable extends Component {
   componentDidMount = async () => {
     
     this.setState({ isLoading: true })
-    
+    await this.getDomain()
     this.columns = [{
       key: 'name',
       title: 'Name',
@@ -331,15 +332,15 @@ class PeersTable extends Component {
       },
     },
   ]
-    
-  await this.props.PeersStore.getPeers()
-  .then((response) => {
-    if (!response) response = []
-    const peersWithUrls = this.mergePeersWithItsUrls(response)
-    this.setState({ dataSource: peersWithUrls, isLoading: false })
-  })
-  .catch(error => this.setState({ error, isLoading: false }))
-}
+
+    await this.props.PeersStore.getPeers()
+      .then((response) => {
+        if (!response) response = []
+        const peersWithUrls = this.mergePeersWithItsUrls(response)
+        this.setState({ dataSource: peersWithUrls, isLoading: false })
+      })
+      .catch(error => this.setState({ error, isLoading: false }))
+  }
 
   handleTableChange = (pagination, filters, sorter) => {
     console.log('Various parameters', pagination, filters, sorter)
@@ -351,19 +352,25 @@ class PeersTable extends Component {
       },
     })
     console.log(`new sort order = ${this.state.sortedInfo.order}`)
-
   }
 
-  mergePeersWithItsUrls = (peers) => {
-    return peers.map((peer) => {
-      const domain = this.props.SettingsStore.getDomain()
-      const url = {'url' : peer.name.concat(domain)}
-      const test = {'test' : peer.uid.substring(0,1)}
+  getDomain = () => {
+    this.props.SettingsStore.getSettings().then(() => {
+      const domain = this.props.SettingsStore.domain
+      this.setState({domain: domain})
+    })
+  }
+
+  mergePeersWithItsUrls =  (peers) => {
+    const peersWithUrl = peers.map((peer) => {
+      const { domain } = this.state
+      const fullURL = peer.name.concat('@').concat(domain)
+      const url = {'url' : fullURL}
       const {selectedChannelOption} = this.state
       const channels = {'channels' : selectedChannelOption}
-
-      return Object.assign({}, peer, url, channels, test)
+      return Object.assign({}, peer, url, channels)
     })
+    return peersWithUrl
   }
 
   getPeers = async () => {
@@ -394,9 +401,33 @@ class PeersTable extends Component {
     .catch(error => this.setState({ error, isLoading: false }))
   }
 
+  waitWhenServerDeleteThePeer = (key) => {
+    let isDeleted = false
+    const pr = this.props
+    const peerName = this.getPeerNameByKey(key)
+
+    console.log(`isDeleted = ${isDeleted}`)
+    let myInterval = setInterval(function() {
+      isDeleted = pr.ServerEventsStore.isPeerDeleted(peerName)
+      console.log(`isDeleted = ${isDeleted}`)
+      if (isDeleted) {
+        clearInterval(myInterval)
+      }
+    }, 1000)
+  }
+
+  getPeerNameByKey = (key) => {
+    return this.state.dataSource.filter(item => item.uid === key)[0].name
+  }
+
   async delete(key) {
+    this.setState({isLoading: true})
+
+    await this.waitWhenServerDeleteThePeer.bind(this, key)
     await this.props.PeersStore.deletePeer(key)
     await this.reloadPeers()
+
+    this.setState({isLoading: false})
   }
 
   showLogs = (key) => {
@@ -460,10 +491,10 @@ class PeersTable extends Component {
     }
   }
 
-  handleMessageShowing = () => {
+  handleMessageDissapearing = () => {
     setTimeout(() => {
-      this.setState({isError: false, isInfo: false, errorMessage: '', infoMessage: ''})
-    }, 3000)
+      this.setState({isError: false, isInfo: false, isSuccess: false, message: '',  isLoading: false})
+    }, 5000)
   }
 
   save(form, key) {
@@ -484,13 +515,13 @@ class PeersTable extends Component {
           this.setState({ isError: true, errorMessage: response.data.message, isLoading: false })
           this.handleMessageShowing()
         } else if (response.status === 200 || response.status === 204) {
-          this.setState({ isSuccess: true, infoMessage: 'Peer has successfully updated', isLoading: false })
+          this.setState({ isSuccess: true, message: 'Peer has successfully updated', isLoading: false })
           this.handleMessageShowing()
         }
       })
       .catch(error => {
         console.log('ERROR: ', error)
-        this.setState({ isError: true, errorMessage: error, isLoading: false })
+        this.setState({ isError: true, message: error, isLoading: false })
       })
       
       this.props.PeersStore.getPeers()
@@ -521,24 +552,21 @@ class PeersTable extends Component {
       this.setState({ isCreating: false, isLoading: true, dataSource: ds})
       this.props.PeersStore.addPeer(row)
         .then((response) => {
-          // if (!response) response = []
-          if (!response && (response.status !== 200 || response.status !== 201)) {
-            this.setState({isError: true, errorMessage: response.data.message})
+          if (response.status && response.status !== 201) {
+            this.setState({isError: true, message: response.data.message})
           } else {
-          const peerWithUrls = this.mergePeersWithItsUrls([response])
-          const {dataSource: updatedDataSource} = this.state
-          updatedDataSource.push(peerWithUrls[0])
-          this.setState({ dataSource: updatedDataSource, isLoading: false })
-          this.setState({ isInfo: true, infoMessage: 'Peer created successfuly' })
-          this.handleMessageShowing()
+            const peerWithUrls = this.mergePeersWithItsUrls([response.data])
+            const {dataSource: updatedDataSource} = this.state
+            updatedDataSource.push(peerWithUrls[0])
+            this.setState({ dataSource: updatedDataSource, isLoading: false, isSuccess: true, message: `Peer ${row.name} was scheduled to be created` })
           }
-        })
-        .catch(error => this.setState({ error, isLoading: false }))
+
+        }).then(() => {this.handleMessageDissapearing()})
     })
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
-  })
+    })
   }
 
   cancel = () => {
@@ -572,8 +600,9 @@ class PeersTable extends Component {
     })
 
     const nextPeer = this.state.dataSource ? this.state.dataSource.length : 0
-    let { isError, isInfo, errorMessage, infoMessage } = this.state
+    let { isError, isInfo, isSuccess, message } = this.state
     const ButtonGroup = Button.Group
+    const messageAlert = <Alert type = {isError ? 'error' : (isSuccess ? 'success' : 'info')} className = 'alertHideAnimation' style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message = { message || ''} showIcon />
 
     return (
         <Fragment>
@@ -597,8 +626,9 @@ class PeersTable extends Component {
                 Add Peer<Icon type='plus' />
               </Button>
             </ButtonGroup>
-            {isError && <Alert id="errorMessage" style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message={errorMessage} type="error" showIcon />}
-            {isInfo && <Alert id="infoMessage" style={{marginLeft: 20, opacity: 1, transition: 'opacity 0.2s 1s ease' }} message={infoMessage} type="success" showIcon />}
+            {/* {isError && <Alert id="errorMessage" className = 'alertHideAnimation' style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message={errorMessage} type="error" showIcon />} */}
+            {/* {isInfo && <Alert id="infoMessage" className = 'alertHideAnimation' style={{marginLeft: 20, opacity: 1, transition: 'opacity 0.2s 1s ease' }} message={infoMessage} type="success" showIcon />} */}
+            <div>{(isSuccess || isError) && messageAlert}</div>
           </div>
           <Table
             className='peersTableContainer'

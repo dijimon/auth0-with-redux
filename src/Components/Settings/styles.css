@@ -1,22 +1,3 @@
-.alertHideAnimation {
-    margin-bottom: 20;
-    transition: 'opacity 2s linear';
-    animation: opacityToggle 5s;
- }
- @keyframes opacityToggle{
-    0%{
-      opacity: 0;
-    }
-    30%{
-       opacity: 1
-    }
-    60%{
-        opacity: 1
-    }
-    100%{
-      opacity: 0;
-    }
-}
 span .editIcon:hover {
     color: #1890FF
 }

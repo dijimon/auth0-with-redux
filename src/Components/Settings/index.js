@@ -82,7 +82,11 @@ class Settings extends Component {
         })
       }
     })
-    await setTimeout(() => {
+    this.handleMessageDissapearing()
+  }
+
+  handleMessageDissapearing = () => {
+    setTimeout(() => {
       this.setState({ isSuccess: false, isError: false, message: '', isDisabled: true })
     }, 5000)
   }
