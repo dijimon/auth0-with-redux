@@ -626,8 +626,6 @@ class PeersTable extends Component {
                 Add Peer<Icon type='plus' />
               </Button>
             </ButtonGroup>
-            {/* {isError && <Alert id="errorMessage" className = 'alertHideAnimation' style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message={errorMessage} type="error" showIcon />} */}
-            {/* {isInfo && <Alert id="infoMessage" className = 'alertHideAnimation' style={{marginLeft: 20, opacity: 1, transition: 'opacity 0.2s 1s ease' }} message={infoMessage} type="success" showIcon />} */}
             <div>{(isSuccess || isError) && messageAlert}</div>
           </div>
           <Table
