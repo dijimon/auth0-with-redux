@@ -25,7 +25,7 @@ class ServerEventsStore {
   
   @action
   setServerEvent = (e) => {
-    if (e !== 'Opened') this.serverEvents.push(e) 
+    if (JSON.parse(e).type !== 'connectionOpened') this.serverEvents.push(e) 
   }
 }
 
