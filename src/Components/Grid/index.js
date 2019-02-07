@@ -20,11 +20,13 @@ import * as ENDPOINTS from './../../endpoints.js'
 
 const { Content, Footer, Sider } = Layout
 @inject('ServerEventsStore')
+@inject('PeersStore')
 @observer
 @withRouter
 class Grid extends Component {
     constructor (props) {
       super(props)
+      this.sseSource = new EventSource(ENDPOINTS.sseURL, { withCredentials: false })
 
       this.state = {
         collapsed: this.getFromLS('collapsed') || false,
@@ -43,18 +45,29 @@ class Grid extends Component {
       this.serverEventsService()
     }
 
+    componentWillUnmount = () => {
+      this.sseSource.removeEventListener('onmessage')
+      this.sseSource.removeEventListener('onopen')
+      this.sseSource.removeEventListener('onerror')
+    }
+
     serverEventsService = () => {
-      let sseSource = new EventSource(ENDPOINTS.sseURL, { withCredentials: false })
-      let myReadyState = sseSource.readyState
+     
+      let myReadyState = this.sseSource.readyState
       console.log(`Begin myReadyState = ${myReadyState}`)
 
-      sseSource.onmessage = (e) => {
-        console.log(`Onmessage, message: ${e.data}, myReadyState: ${myReadyState}`)
+      this.sseSource.onmessage = (e) => {
+        console.log(`%c Onmessage, message: ${e.data}, myReadyState: ${myReadyState}`, 'background: lightblue')
         this.props.ServerEventsStore.setServerEvent(e.data)
+
+          // change status of peers
+          if (e.data && JSON.parse(e.data).type === 'podUpdated' && e.data.toString().includes('Status')) {
+            this.props.PeersStore.getPeers()
+            this.forceUpdate()
+          }
       }
 
-      sseSource.onerror = (e) => {
-          // let evt = e || event
+      this.sseSource.onerror = (e) => {
           let msg = ''
           console.log(`e.target.readyState = ${e.target.readyState}`)
           switch( e.target.readyState ){
@@ -69,11 +82,11 @@ class Grid extends Component {
                   msg = 'Connection is opened'
                   break
           }
-          console.log(`Onerror, message: ${msg}, myReadyState: ${myReadyState}`)
+          console.log(`%c Onerror, message: ${msg}, myReadyState: ${myReadyState}`, 'background: red')
       }
 
-      sseSource.onopen = (e) => {
-          console.log(`Onopen, message: ${e.target.value}, myReadyState: ${myReadyState}`)
+      this.sseSource.onopen = (e) => {
+          console.log(`%c Onopen, message: ${e.target.value}, myReadyState: ${myReadyState}`, 'background: lightgreen')
       }
     }
 
