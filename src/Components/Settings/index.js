@@ -51,13 +51,11 @@ class Settings extends Component {
   }
 
   getOrgName = () => {
-    const orgName = this.props.SettingsStore.settings ? this.props.SettingsStore.settings.name : ''
-    return orgName
+    return this.props.SettingsStore.name
   }
 
   getDomain = () => {
-    const domain = this.props.SettingsStore.settings ? this.props.SettingsStore.settings.domain : ''
-    return domain 
+    return this.props.SettingsStore.domain 
   }
 
   getSettings = async () => {
@@ -84,7 +82,11 @@ class Settings extends Component {
         })
       }
     })
-    await setTimeout(() => {
+    this.handleMessageDissapearing()
+  }
+
+  handleMessageDissapearing = () => {
+    setTimeout(() => {
       this.setState({ isSuccess: false, isError: false, message: '', isDisabled: true })
     }, 5000)
   }

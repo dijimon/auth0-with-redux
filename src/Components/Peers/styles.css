@@ -1,11 +1,3 @@
-.peersTableContainer .ant-table-body{
-    /* max-height: 300px !important;
-    white-space: nowrap;
-    overflow: hidden; */
-}
-.peersTableContainer {
-    /* background-color: yellow */
-}
 .actionIconContainer:hover {
     cursor: pointer;
 }

@@ -14,7 +14,7 @@ class SettingsStore {
   @observable settings
 
   @computed get name() {
-    return this.settings ? this.settings.name : DEFAULT_PLATFORM_NAME
+   return this.settings ? this.settings.name : DEFAULT_PLATFORM_NAME
   }
 
   @computed get domain() {

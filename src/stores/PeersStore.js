@@ -16,13 +16,15 @@ class PeersStore {
       this.peers.push(response.data)
       if(response.status === 200 || response.status === 201) {
         this.peers.push(response.data)
-        return response.data
+        return response
+        // return response.data
       } else {
         return response
       }
     })
     .catch((error) => {
       console.error(error)
+      return error
     })
   };
 

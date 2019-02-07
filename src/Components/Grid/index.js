@@ -16,9 +16,10 @@ import Home from './../Home/index.js';
 import Dashboard from './../Dashboard/index.js';
 import logo from './../../assets/logo.png'
 import './styles.css'
+import * as ENDPOINTS from './../../endpoints.js'
 
 const { Content, Footer, Sider } = Layout
-@inject('SettingsStore')
+@inject('ServerEventsStore')
 @observer
 @withRouter
 class Grid extends Component {
@@ -36,6 +37,44 @@ class Grid extends Component {
       history: PropTypes.shape({
         push: PropTypes.func.isRequired,
       })
+    }
+
+    componentDidMount = () => {
+      this.serverEventsService()
+    }
+
+    serverEventsService = () => {
+      let sseSource = new EventSource(ENDPOINTS.sseURL, { withCredentials: false })
+      let myReadyState = sseSource.readyState
+      console.log(`Begin myReadyState = ${myReadyState}`)
+
+      sseSource.onmessage = (e) => {
+        console.log(`Onmessage, message: ${e.data}, myReadyState: ${myReadyState}`)
+        this.props.ServerEventsStore.setServerEvent(e.data)
+      }
+
+      sseSource.onerror = (e) => {
+          // let evt = e || event
+          let msg = ''
+          console.log(`e.target.readyState = ${e.target.readyState}`)
+          switch( e.target.readyState ){
+              case EventSource.CONNECTING:
+                  msg = 'Reconnecting…'
+                  break
+
+              case EventSource.CLOSED:
+                  msg = 'Connection failed. Will not retry.'
+                  break;
+              case EventSource.OPEN:
+                  msg = 'Connection is opened'
+                  break
+          }
+          console.log(`Onerror, message: ${msg}, myReadyState: ${myReadyState}`)
+      }
+
+      sseSource.onopen = (e) => {
+          console.log(`Onopen, message: ${e.target.value}, myReadyState: ${myReadyState}`)
+      }
     }
 
     onCollapse = (collapsed) => {
