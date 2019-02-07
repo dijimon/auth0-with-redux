@@ -39,7 +39,7 @@ class EditableCell extends Component {
 
   constructor(props) {
     super(props)
-    
+
     this.state = {
       channels: [ // TODO: get from API hen it will be provided
         { 
@@ -174,7 +174,7 @@ class PeersTable extends Component {
   componentDidMount = async () => {
     
     this.setState({ isLoading: true })
-    await this.getDomain()
+    
     this.columns = [{
       key: 'name',
       title: 'Name',
@@ -333,13 +333,17 @@ class PeersTable extends Component {
     },
   ]
 
+    await this.getDomain()
     await this.props.PeersStore.getPeers()
       .then((response) => {
         if (!response) response = []
         const peersWithUrls = this.mergePeersWithItsUrls(response)
         this.setState({ dataSource: peersWithUrls, isLoading: false })
-      })
-      .catch(error => this.setState({ error, isLoading: false }))
+      }).catch(error => this.setState({ error, isLoading: false }))
+  }
+
+  componentWillReceiveProps = () => {
+    this.getPeers()
   }
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -361,16 +365,14 @@ class PeersTable extends Component {
     })
   }
 
-  mergePeersWithItsUrls =  (peers) => {
-    const peersWithUrl = peers.map((peer) => {
-      const { domain } = this.state
+  mergePeersWithItsUrls = (peers) => {
+    return peers.map((peer) => {
+      const { domain, selectedChannelOption } = this.state
       const fullURL = peer.name.concat('@').concat(domain)
       const url = {'url' : fullURL}
-      const {selectedChannelOption} = this.state
       const channels = {'channels' : selectedChannelOption}
       return Object.assign({}, peer, url, channels)
     })
-    return peersWithUrl
   }
 
   getPeers = async () => {
@@ -403,15 +405,17 @@ class PeersTable extends Component {
 
   waitWhenServerDeleteThePeer = (key) => {
     let isDeleted = false
-    const pr = this.props
+    const _props = this.props
+    const _reloadPeers = this.reloadPeers.bind(this)
     const peerName = this.getPeerNameByKey(key)
 
-    console.log(`isDeleted = ${isDeleted}`)
     let myInterval = setInterval(function() {
-      isDeleted = pr.ServerEventsStore.isPeerDeleted(peerName)
+      isDeleted = _props.ServerEventsStore.isPeerDeleted(peerName)
       console.log(`isDeleted = ${isDeleted}`)
+      
       if (isDeleted) {
         clearInterval(myInterval)
+        _reloadPeers()
       }
     }, 1000)
   }
@@ -420,14 +424,15 @@ class PeersTable extends Component {
     return this.state.dataSource.filter(item => item.uid === key)[0].name
   }
 
+  getServerEvents = () => {
+    const se =  this.props.ServerEventsStore.getServerEvents()
+    console.log(`@@@ SERVER EVENTS => ${se}`)
+  }
+
   async delete(key) {
     this.setState({isLoading: true})
-
-    await this.waitWhenServerDeleteThePeer.bind(this, key)
-    await this.props.PeersStore.deletePeer(key)
-    await this.reloadPeers()
-
-    this.setState({isLoading: false})
+    this.props.PeersStore.deletePeer(key)
+    this.waitWhenServerDeleteThePeer.call(this, key)
   }
 
   showLogs = (key) => {
@@ -600,7 +605,7 @@ class PeersTable extends Component {
     })
 
     const nextPeer = this.state.dataSource ? this.state.dataSource.length : 0
-    let { isError, isInfo, isSuccess, message } = this.state
+    let { isError, isSuccess, message } = this.state
     const ButtonGroup = Button.Group
     const messageAlert = <Alert type = {isError ? 'error' : (isSuccess ? 'success' : 'info')} className = 'alertHideAnimation' style={{marginLeft: 20, opacity: 1,  transition: 'opacity 0.2s 1s ease' }} message = { message || ''} showIcon />
 
@@ -614,17 +619,18 @@ class PeersTable extends Component {
             </Tooltip>
             <ButtonGroup>
               <Button
-                disabled={this.state.isCreating}
+                disabled={this.state.isCreating || this.state.isLoading}
                 type='primary' 
                 onClick={() => this.reloadPeers()}>
                 <Icon type='reload' />Reload
               </Button>
               <Button
-                disabled={this.state.isCreating}
+                disabled={this.state.isCreating || this.state.isLoading}
                 type='primary'
                 onClick={() => this.add(nextPeer)}>
-                Add Peer!!<Icon type='plus' />
+                Add Peer {nextPeer}<Icon type='plus' />
               </Button>
+              <button onClick={this.getServerEvents}>TEST</button>
             </ButtonGroup>
             <div>{(isSuccess || isError) && messageAlert}</div>
           </div>
@@ -634,7 +640,7 @@ class PeersTable extends Component {
             // size='small'
             bordered
             dataSource={this.state.dataSource}
-            rowKey='uid'
+            rowKey={record => record.uid}
             columns={columns}
             rowClassName='editable-row'
             loading={this.state.isLoading}
