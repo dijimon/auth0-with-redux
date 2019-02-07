@@ -14,7 +14,8 @@ import TheMenu from './../TheMenu/index.js';
 import TheHeader from './../TheHeader/index.js';
 import Home from './../Home/index.js';
 import Dashboard from './../Dashboard/index.js';
-import logo from './../../assets/logo.png'
+import logoOnDark from './../../assets/catalyst-logo-ondark.svg'
+import logoOnLight from './../../assets/catalyst-logo.svg'
 import './styles.css'
 import * as ENDPOINTS from './../../endpoints.js'
 
@@ -119,7 +120,7 @@ class Grid extends Component {
                     <div className='logoContainer'>
                       <div className={this.state.collapsed ? 'logoSmall' : 'logoBig'}>
                           <a onClick={this.handleLogoClick}>
-                            <img src={logo} alt="logo" />
+                            <img src={this.state.theme === 'dark' ? logoOnDark : logoOnLight} alt="logo" />
                           </a>
                       </div>
                     </div>
