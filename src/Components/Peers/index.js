@@ -358,8 +358,8 @@ class PeersTable extends Component {
     console.log(`new sort order = ${this.state.sortedInfo.order}`)
   }
 
-  getDomain = () => {
-    this.props.SettingsStore.getSettings().then(() => {
+  getDomain = async () => {
+    await this.props.SettingsStore.getSettings().then(() => {
       const domain = this.props.SettingsStore.domain
       this.setState({domain: domain})
     })
