@@ -3,7 +3,7 @@ import { bool, func } from 'prop-types';
 import { connect } from 'react-redux';
 import Auth0Lock from 'auth0-lock';
 import { AUTH_CONFIG } from '../Auth0/config';
-import Button from './button';
+//import Button from './button';
 import { login, logout } from '../store/user';
 
 import Styles from './styles.scss';
