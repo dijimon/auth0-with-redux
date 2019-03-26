@@ -1,0 +1,38 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "airbnb",
+    "prettier",
+    "prettier/react"
+  ],
+  "env": {
+    "browser": true
+  },
+  "plugins": [
+    "compat",
+    "prettier"
+  ],
+  "rules": {
+    "compat/compat": "error",
+    "prettier/prettier": "error",
+    "jsx-a11y/anchor-is-valid": ["error", {
+      "components": [ "Link" ],
+      "specialLink": [ "to" ]
+    }],
+    "import/prefer-default-export": 0,
+    "react/forbid-prop-types": 0,
+    "react/prop-types": 0,
+    "react/destructuring-assignment": 0,
+    "spaced-comment": 0,
+    "react/sort-comp": 0,
+    "no-underscore-dangle": 0
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "config/webpack.config.production.js"
+      }
+    },
+    "polyfills": ["promises"]
+  }
+}
