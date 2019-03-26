@@ -1,8 +1,0 @@
-span .editIcon:hover {
-    color: #1890FF
-}
-input[type="text"]:disabled {
-    background-color: #fff;
-    color: #595959;
-    cursor: default;
-}
