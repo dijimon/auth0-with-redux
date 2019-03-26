@@ -42,10 +42,7 @@ class EditableCell extends Component {
 
     this.state = {
       channels: [ // TODO: get from API hen it will be provided
-        { 
-          value: 'ch1', 
-          label: 'Channel1'
-        },
+        { value: 'ch1', label: 'Channel1' },
         { value: 'ch2', label: 'Channel2' },
         { value: 'ch3', label: 'Channel3' },
         { value: 'ch4', label: 'Channel4' },
@@ -69,7 +66,7 @@ class EditableCell extends Component {
   }
 
   handleNameChanging = () => {
-    console.log('Naaame')
+    console.log('Name')
   }
 
   handleChannelsChange = (selectedChannelOptions) => {

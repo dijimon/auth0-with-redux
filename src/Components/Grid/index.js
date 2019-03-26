@@ -14,8 +14,8 @@ import TheMenu from './../TheMenu/index.js';
 import TheHeader from './../TheHeader/index.js';
 import Home from './../Home/index.js';
 import Dashboard from './../Dashboard/index.js';
-import logoOnDark from './../../assets/catalyst-logo-ondark.svg'
-import logoOnLight from './../../assets/catalyst-logo.svg'
+import logoOnDark from './../../assets/CATALYST_BP_onDark.svg'
+import logoOnLight from './../../assets/CATALYST_BP_onWhite.svg'
 import './styles.css'
 import * as ENDPOINTS from './../../endpoints.js'
 

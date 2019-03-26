@@ -121,7 +121,7 @@ class PeerDashboard extends Component {
                           )}
                           data={salesPieData}
                           valueFormat={val => <span dangerouslySetInnerHTML={{ __html: val }} />}
-                          height={140}
+                          height={240}
                         />
                     </Card>
                 </Col>
@@ -136,7 +136,7 @@ class PeerDashboard extends Component {
                     line
                     color='#cceafe'
                     data={visitData}
-                /> 
+                />
                 </Card>
             </Col>
             </Row>
