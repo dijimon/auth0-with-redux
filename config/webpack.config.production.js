@@ -95,12 +95,12 @@ module.exports = {
       {
         test: /\.svg$/,
         options: {
-          includePaths: [`${paths.publicFiles}`],
+          includePaths: [`${paths.publicFiles}/assets`],
         },
         loader: 'svg-sprite-loader',
       },
       {
-        include: [paths.publicFiles],
+        include: [paths.publicFiles, `${paths.publicFiles}/assets`],
         exclude: [path.join(paths.publicFiles, 'index.html')],
         loader: 'file-loader',
       },
