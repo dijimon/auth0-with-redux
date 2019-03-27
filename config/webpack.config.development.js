@@ -30,7 +30,6 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        exclude: [`${paths.publicFiles}/assets`],
         loader: 'svg-sprite-loader',
       },
       {

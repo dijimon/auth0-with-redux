@@ -94,8 +94,11 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        exclude: [`${paths.publicFiles}/assets`],
         loader: 'svg-sprite-loader',
+        options: {
+          extract: true,
+          publicPath: `${paths.publicFiles}/assets`,
+        },
       },
       {
         include: [paths.publicFiles],
