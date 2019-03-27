@@ -30,6 +30,9 @@ module.exports = {
       },
       {
         test: /\.svg$/,
+        options: {
+          includePaths: [`${paths.publicFiles}`],
+        },
         loader: 'svg-sprite-loader',
       },
       {

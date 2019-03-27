@@ -95,7 +95,7 @@ module.exports = {
       {
         test: /\.svg$/,
         options: {
-          includePaths: [paths.assets],
+          includePaths: [`${paths.publicFiles}`],
         },
         loader: 'svg-sprite-loader',
       },

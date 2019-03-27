@@ -38,7 +38,7 @@ class App extends Component {
     return (
       <div className={Styles.loginContainer}>
         <div className={Styles.logoContainer}>
-          <img alt="logo" width="300" src="../assets/CATALYST_BP_onDark.svg" />
+          <img alt="logo" width="300" src="/public/CATALYST_BP_onDark.svg" />
         </div>
         <div style={{ height: '100px' }} />
       </div>
