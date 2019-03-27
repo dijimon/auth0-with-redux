@@ -1,0 +1,39 @@
+options:
+    docker: true
+
+pipelines:
+  default:
+    - step:
+        script:
+          - echo "Everything is awesome!"
+  branches:
+    master:
+    - step:
+        name: docker push
+        image: node
+        caches:
+          - node
+        script: # Modify the commands below to build your repository.
+          - npm install
+          - npm test
+          - npm run build
+          - export IMAGE_NAME=gcr.io/fabric-platform/frontend:$BITBUCKET_COMMIT
+          - echo $GCLOUD_JSON_FILE > ~/.gcloud-api-key.json
+          - docker login -u _json_key -p "$(cat ~/.gcloud-api-key.json)" https://gcr.io/$GCLOUD_PROJECT
+          - docker build -t $IMAGE_NAME . -f .docker/Dockerfile
+          - docker push $IMAGE_NAME
+    - step:
+        name: deployment to k8s
+        image: google/cloud-sdk:latest
+        script:
+          - export IMAGE_NAME=gcr.io/fabric-platform/frontend:$BITBUCKET_COMMIT
+          - echo $GCLOUD_JSON_FILE > ~/.gcloud-api-key.json
+          - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+          - gcloud config set project $GCLOUD_PROJECT
+          - gcloud container clusters get-credentials $GCLOUD_CLUSTER --zone=$GCLOUD_ZONE --project $GCLOUD_PROJECT
+          - gcloud auth configure-docker --quiet
+          - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          - chmod +x ./kubectl
+          - mv ./kubectl /usr/local/bin/kubectl
+          - kubectl set image deployment/landing-deployment frontend=$IMAGE_NAME --record=true
+          - kubectl rollout status deployment/landing-deployment
