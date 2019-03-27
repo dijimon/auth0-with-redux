@@ -40,7 +40,7 @@ class App extends Component {
         <div className={Styles.logoContainer}>
           <img alt="logo" width="300" src="/public/assets/CATALYST_BP_onDark.svg" />
         </div>
-        <div style={{ height: '101px' }} />
+        <div style={{ height: '100px' }} />
       </div>
     );
   }
