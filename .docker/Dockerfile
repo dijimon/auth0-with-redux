@@ -5,8 +5,8 @@ RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
 ADD .docker/nginx.conf /etc/nginx/
 ADD .docker/mustr.conf /etc/nginx/conf.d/
 
+COPY ./public/assets/ /var/www/public/assets
 COPY ./dist /var/www/
-
 WORKDIR /var/www
 
 EXPOSE 3001
