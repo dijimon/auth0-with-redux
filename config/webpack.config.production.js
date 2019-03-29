@@ -115,6 +115,7 @@ module.exports = {
       new OptimizeCSSAssetsPlugin({}),
       new HtmlWebpackPlugin({
         template: path.join(paths.publicFiles, 'index.html'),
+        favicon: `${paths.publicFiles}/assets/favicon-platform.png`,
         minify: {
           collapseWhitespace: true,
         },
