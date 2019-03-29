@@ -3,9 +3,11 @@ export const AUTH_CONFIG = {
   domain: 'catalyst-platform.eu.auth0.com',
   options: {
     allowedConnections: ['Username-Password-Authentication'],
+    rememberLastLogin: false,
     allowShowPassword: true,
     allowSignUp: false,
-    closable: false,
+    closable: true,
+    autoclose: true,
     auth: {
       responseType: 'token id_token',
       redirect: true,
@@ -14,7 +16,6 @@ export const AUTH_CONFIG = {
     theme: {
       primaryColor: '#326fd1',
     },
-    popupOptions: { width: 400, height: 400, left: 200, top: 300 },
     languageDictionary: {
       emailInputPlaceholder: 'login',
       passwordInputPlaceholder: 'password',

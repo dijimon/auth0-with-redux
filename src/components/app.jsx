@@ -20,6 +20,7 @@ class App extends Component {
 
   componentDidMount() {
     this._lock.on('authenticated', authResult => {
+      this._lock.hide();
       this.props.login({
         idToken: authResult.idToken,
         accessToken: authResult.accessToken,
@@ -32,14 +33,21 @@ class App extends Component {
   render() {
     const { loggedIn } = this.props;
     console.log('App render  loggedIn = ', loggedIn);
-    if (!loggedIn) {
+    /*if (!loggedIn) {
       this.showLogin();
-    }
+    }*/
 
     return (
       <div className={Styles.loginContainer}>
         <div className={Styles.logoContainer}>
           <img alt="logo" width="300" src="/public/assets/CATALYST_BP_onDark.svg" />
+          {loggedIn ? (
+            <button type="button" onClick={this.props.logout}>
+              Log out
+            </button>
+          ) : (
+            this.showLogin()
+          )}
         </div>
         <div style={{ height: '100px' }} />
       </div>

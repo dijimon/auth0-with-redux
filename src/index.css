@@ -7,3 +7,7 @@ body {
 .auth0-lock-overlay {
   opacity: 0 !important;
 }
+
+.auth0-lock.auth0-lock .auth0-lock-content-wrapper {
+  overflow: visible !important;
+}
