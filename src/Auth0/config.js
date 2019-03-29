@@ -9,7 +9,6 @@ export const AUTH_CONFIG = {
     auth: {
       responseType: 'token id_token',
       redirect: true,
-      sso: true,
       audience: 'https://nma.catalyst.intellecteu.com/api',
     },
     theme: {

@@ -31,6 +31,7 @@ class App extends Component {
 
   render() {
     const { loggedIn } = this.props;
+    console.log('App render  loggedIn = ', loggedIn);
     if (!loggedIn) {
       this.showLogin();
     }
