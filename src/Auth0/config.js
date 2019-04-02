@@ -6,8 +6,9 @@ export const AUTH_CONFIG = {
     rememberLastLogin: false,
     allowShowPassword: true,
     allowSignUp: false,
-    closable: true,
+    closable: false,
     autoclose: true,
+    usernameStyle: 'email',
     auth: {
       responseType: 'token id_token',
       redirect: true,
@@ -19,7 +20,7 @@ export const AUTH_CONFIG = {
     languageDictionary: {
       emailInputPlaceholder: 'login',
       passwordInputPlaceholder: 'password',
-      title: 'Welcome',
+      title: 'Welcome to platform',
     },
   },
 };
