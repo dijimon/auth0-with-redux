@@ -4,7 +4,6 @@ export const LOGIN = 'LOGIN';
 export const login = credentials => dispatch => {
   console.log('login()...');
   console.log('credentials = ', credentials);
-
   saveCredentials(credentials);
   dispatch({ type: LOGIN, payload: credentials });
 };
@@ -33,10 +32,12 @@ const initialState = () => {
 };
 
 export default (state = initialState(), action) => {
-  console.log({ state, action });
+  console.log('!!!state', state);
+  console.log('!!!action', action);
+
   switch (action.type) {
     case LOGIN:
-      return { loggedIn: true, ...action.payload };
+      return { ...state, loggedIn: true, ...action.payload };
     case LOGOUT:
       return { ...initialState() };
     default:

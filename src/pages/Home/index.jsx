@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { login, logout } from '../../store/user';
 
-const Peers = props => {
+const Home = props => {
   return (
     <section>
       <h1>Peers</h1>
@@ -26,4 +26,4 @@ const mapDispatch = {
 export default connect(
   mapState,
   mapDispatch,
-)(Peers);
+)(Home);

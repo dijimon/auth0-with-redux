@@ -16,10 +16,14 @@ class App extends Component {
     super(props);
 
     this._lock = new Auth0Lock(AUTH_CONFIG.clientId, AUTH_CONFIG.domain, AUTH_CONFIG.options);
+    console.log('lock init ', this._lock);
   }
 
   componentDidMount() {
+    console.log('componentDidMount...');
     this._lock.on('authenticated', authResult => {
+      console.log('authenticated ', authResult);
+
       this._lock.hide();
       this.props.login({
         idToken: authResult.idToken,
@@ -33,14 +37,11 @@ class App extends Component {
   render() {
     const { loggedIn } = this.props;
     console.log('App render  loggedIn = ', loggedIn);
-    /*if (!loggedIn) {
-      this.showLogin();
-    }*/
 
     return (
       <div className={Styles.loginContainer}>
         <div className={Styles.logoContainer}>
-          <img alt="logo" width="300" src="/public/assets/CATALYST_BP_onDark.svg" />
+          {/*<img alt="logo" width="300" src="" />*/}
           {loggedIn ? (
             <button type="button" onClick={this.props.logout}>
               Log out

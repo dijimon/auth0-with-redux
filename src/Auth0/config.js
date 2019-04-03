@@ -12,6 +12,7 @@ export const AUTH_CONFIG = {
     auth: {
       responseType: 'token id_token',
       redirect: true,
+      redirectUrl: 'http://localhost:3000/home',
       audience: 'https://nma.catalyst.intellecteu.com/api',
     },
     theme: {
