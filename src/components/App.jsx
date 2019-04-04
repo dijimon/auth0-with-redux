@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { bool, func } from 'prop-types';
 import { connect } from 'react-redux';
 import Auth0Lock from 'auth0-lock';
@@ -30,7 +31,7 @@ class App extends Component {
         console.log('error ', error);
       });
 
-      this.props.history.push('/home');
+      this.props.history.push('/');
     });
   }
 
@@ -49,9 +50,12 @@ class App extends Component {
         <div className={Styles.logoContainer}>
           <img alt="logo" width="300" src="/public/assets/CATALYST_BP_onDark.svg" />
           {loggedIn ? (
-            <button type="button" onClick={this._logout}>
-              Log out
-            </button>
+            <Redirect
+              to={{
+                pathname: '/',
+                state: { from: this.props.location },
+              }}
+            />
           ) : (
             this.showLogin()
           )}

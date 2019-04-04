@@ -15,7 +15,7 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
 //Pages
-import Home from './pages/Home';
+import Peers from './pages/Peers';
 import NotFound from './pages/NotFound';
 
 const store = initStore();
@@ -28,12 +28,12 @@ ReactDOM.render(
         <PrivateRoute
           exact
           path="/"
-          component={Home}
+          component={Peers}
           isAuthenticated={store.getState().user.loggedIn /* this method returns true or false */}
         />
         <PrivateRoute
-          path="/home"
-          component={Home}
+          path="/peers"
+          component={Peers}
           isAuthenticated={store.getState().user.loggedIn /* this method returns true or false */}
         />
         <Route component={NotFound} />

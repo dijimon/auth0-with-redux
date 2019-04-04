@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { login, logout } from '../../store/user';
 
-const Home = props => {
+const Peers = props => {
   const _logout = () => {
     props.logout();
     props.history.push('/login');
@@ -31,4 +31,4 @@ const mapDispatch = {
 export default connect(
   mapState,
   mapDispatch,
-)(Home);
+)(Peers);
