@@ -4,10 +4,15 @@ import { connect } from 'react-redux';
 import { login, logout } from '../../store/user';
 
 const Home = props => {
+  const _logout = () => {
+    props.logout();
+    props.history.push('/login');
+  };
+
   return (
     <section>
       <h1>Peers</h1>
-      <button type="button" onClick={props.logout}>
+      <button type="button" onClick={_logout}>
         Log out
       </button>
     </section>
