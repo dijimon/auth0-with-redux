@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 import React, { Component } from 'react';
 import { bool, func } from 'prop-types';
 import { connect } from 'react-redux';

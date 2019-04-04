@@ -12,7 +12,7 @@ import initStore from './store';
 //Styles
 import './index.css';
 
-import registerServiceWorker from './registerServiceWorker';
+// import registerServiceWorker from './registerServiceWorker';
 
 //Pages
 import Home from './pages/Home';
@@ -42,4 +42,4 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root'),
 );
-registerServiceWorker();
+//registerServiceWorker();
