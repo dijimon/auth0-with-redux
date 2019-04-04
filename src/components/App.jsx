@@ -27,6 +27,10 @@ class App extends Component {
         accessToken: authResult.accessToken,
       });
 
+      this._lock.on('authorization_error', error => {
+        console.log('error ', error);
+      });
+
       this.props.history.push('/home');
     });
   }
