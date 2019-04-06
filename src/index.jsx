@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Switch, Route } from 'react-router-dom';
-import PrivateRoute from 'react-private-route';
 import { Provider } from 'react-redux';
+import { Router, Switch, Route } from 'react-router-dom';
+import PrivateRoute from './components/privateRoute';
 
 //Components
 import history from './components/history';
@@ -24,19 +24,10 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>
       <Switch>
+        <PrivateRoute exact path="/" component={Peers} isAuthenticated={store.getState()} />
+        <PrivateRoute exact path="/peers" component={Peers} isAuthenticated={store.getState()} />
         <Route path="/login" component={App} />
-        <PrivateRoute
-          exact
-          path="/"
-          component={Peers}
-          isAuthenticated={store.getState().user.loggedIn /* this method returns true or false */}
-        />
-        <PrivateRoute
-          path="/peers"
-          component={Peers}
-          isAuthenticated={store.getState().user.loggedIn /* this method returns true or false */}
-        />
-        <Route component={NotFound} />
+        <Route path="*" component={NotFound} />
       </Switch>
     </Router>
   </Provider>,

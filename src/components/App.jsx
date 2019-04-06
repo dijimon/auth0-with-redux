@@ -15,13 +15,15 @@ import Styles from './styles.scss';
 class App extends Component {
   constructor(props) {
     super(props);
-
     this._lock = new Auth0Lock(AUTH_CONFIG.clientId, AUTH_CONFIG.domain, AUTH_CONFIG.options);
   }
 
   componentDidMount() {
     this._lock.on('authenticated', authResult => {
+      console.log('!!authenticated');
+
       this._lock.hide();
+
       this.props.login({
         idToken: authResult.idToken,
         accessToken: authResult.accessToken,
@@ -31,34 +33,23 @@ class App extends Component {
         console.log('error ', error);
       });
 
-      this.props.history.push('/');
+      // this.props.history.push('/peers');
     });
   }
 
   showLogin = () => this._lock.show();
 
-  _logout = () => {
-    this.props.logout();
-    this.props.history.push('/login');
-  };
-
   render() {
     const { loggedIn } = this.props;
+    console.log('App render loggedIn = ', loggedIn);
 
-    return (
+    return loggedIn ? (
+      <Redirect to={{ pathname: '/' }} />
+    ) : (
       <div className={Styles.loginContainer}>
         <div className={Styles.logoContainer}>
-          <img alt="logo" width="300" src="/public/assets/CATALYST_BP_onDark.svg" />
-          {loggedIn ? (
-            <Redirect
-              to={{
-                pathname: '/',
-                state: { from: this.props.location },
-              }}
-            />
-          ) : (
-            this.showLogin()
-          )}
+          {/*<img alt="logo" width="300" src="" />*/}
+          {this.showLogin()}
         </div>
         <div style={{ height: '100px' }} />
       </div>
