@@ -24,9 +24,9 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>
       <Switch>
-        <PrivateRoute exact path="/" component={Peers} isAuthenticated={store.getState()} />
-        <PrivateRoute exact path="/peers" component={Peers} isAuthenticated={store.getState()} />
         <Route path="/login" component={App} />
+        <PrivateRoute exact path="/" component={Peers} />
+        <PrivateRoute exact path="/peers" component={Peers} />
         <Route path="*" component={NotFound} />
       </Switch>
     </Router>
