@@ -49,7 +49,7 @@ class App extends Component {
     ) : (
       <div className={Styles.loginContainer}>
         <div className={Styles.logoContainer}>
-          {/*<img alt="logo" width="300" src="" />*/}
+          <img alt="logo" width="300" src="/public/assets/CATALYST_BP_onDark.svg" />
           {this.showLogin()}
         </div>
         <div style={{ height: '100px' }} />
