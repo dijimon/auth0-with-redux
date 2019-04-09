@@ -13,7 +13,7 @@ export const AUTH_CONFIG = {
       responseType: 'token id_token',
       redirect: false,
       audience: 'https://nma.catalyst.intellecteu.com/api',
-      returnTo: 'http://localhost:3000/login',
+      //returnTo: 'http://localhost:3000/login',
     },
     theme: {
       primaryColor: '#326fd1',

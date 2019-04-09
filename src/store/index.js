@@ -24,6 +24,8 @@ const reducers = combineReducers({
 export default function initStore() {
   const store = createStore(reducers, applyMiddleware(thunkMiddleware, logger));
   console.log('store', store);
+  console.log('process.env.NODE_ENV = ', process.env.NODE_ENV);
+  console.log('process.env.PUBLIC_URL = ', process.env.PUBLIC_URL);
   if (process.env.NODE_ENV === 'development' && window !== undefined) {
     window.store = store;
   }
