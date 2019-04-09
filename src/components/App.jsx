@@ -25,6 +25,7 @@ class App extends Component {
       this._lock.hide();
 
       this.props.login({
+        lock: this._lock,
         idToken: authResult.idToken,
         accessToken: authResult.accessToken,
       });

@@ -5,7 +5,7 @@ import { login, logout } from '../../store/user';
 
 const Peers = props => {
   const _logout = () => {
-    props.logout();
+    props.logout(props.lock);
     props.history.push('/login');
   };
 
@@ -21,6 +21,7 @@ const Peers = props => {
 
 const mapState = state => ({
   loggedIn: state.user.loggedIn,
+  lock: state.user.lock,
 });
 
 const mapDispatch = {

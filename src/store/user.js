@@ -9,9 +9,11 @@ export const login = credentials => dispatch => {
 };
 
 export const LOGOUT = 'LOGOUT';
-export const logout = () => dispatch => {
+export const logout = lock => dispatch => {
   removeCredentials();
   dispatch({ type: LOGOUT });
+  console.log('lock.logout...');
+  lock.logout();
 };
 
 const initialState = () => {
