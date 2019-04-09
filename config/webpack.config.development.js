@@ -71,6 +71,10 @@ module.exports = {
       favicon: `${paths.publicFiles}/assets/favicon-platform.png`,
     }),
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.PROJECT_ENV': JSON.stringify(process.env.PROJECT_ENV),
+      'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL),
+    }),
   ],
   devServer: {
     historyApiFallback: true,

@@ -2,9 +2,7 @@ import { getCredentials, saveCredentials, removeCredentials } from '../utils/tok
 
 export const LOGIN = 'LOGIN';
 export const login = credentials => dispatch => {
-  console.log('login saveCredentials');
   saveCredentials(credentials);
-  console.log('login dispatch action LOGIN');
   dispatch({ type: LOGIN, payload: credentials });
 };
 
@@ -12,8 +10,8 @@ export const LOGOUT = 'LOGOUT';
 export const logout = lock => dispatch => {
   removeCredentials();
   dispatch({ type: LOGOUT });
-  console.log('lock.logout...');
-  lock.logout();
+  //console.log('lock.logout...');
+  //lock.logout();
 };
 
 const initialState = () => {

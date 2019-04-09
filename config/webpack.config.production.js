@@ -120,7 +120,10 @@ module.exports = {
           collapseWhitespace: true,
         },
       }),
-      new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }),
+      new webpack.DefinePlugin({
+        'process.env.PROJECT_ENV': JSON.stringify(process.env.PROJECT_ENV),
+        'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL),
+      }),
     ];
     if (process.argv.includes('--analyze')) {
       plugins.push(new BundleAnalyzerPlugin());

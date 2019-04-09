@@ -16,7 +16,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - npm install
           - npm test
-          - npm run build
+          - npm run build:development
           - export IMAGE_NAME=gcr.io/fabric-platform/frontend:$BITBUCKET_COMMIT
           - echo $GCLOUD_JSON_FILE > ~/.gcloud-api-key.json
           - docker login -u _json_key -p "$(cat ~/.gcloud-api-key.json)" https://gcr.io/$GCLOUD_PROJECT

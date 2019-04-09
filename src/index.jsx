@@ -10,7 +10,7 @@ import App from './components/App';
 import initStore from './store';
 
 //Styles
-import './index.css';
+import './index.scss';
 
 import registerServiceWorker from './registerServiceWorker';
 
