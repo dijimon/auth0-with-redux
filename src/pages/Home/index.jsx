@@ -33,12 +33,12 @@ const Home = props => {
           Log out
         </button>
         <Switch>
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/peers" component={Peers} />
-          <Route path="/orderers" component={Orderers} />
-          <Route path="/cas" component={CAS} />
-          <Route path="/channels" component={Channels} />
-          <Route path="/chaincodes" component={Chaincodes} />
+          <PrivateRoute path="/dashboard" component={Dashboard} />
+          <PrivateRoute path="/peers" component={Peers} />
+          <PrivateRoute path="/orderers" component={Orderers} />
+          <PrivateRoute path="/cas" component={CAS} />
+          <PrivateRoute path="/channels" component={Channels} />
+          <PrivateRoute path="/chaincodes" component={Chaincodes} />
         </Switch>
       </div>
     </Container>
