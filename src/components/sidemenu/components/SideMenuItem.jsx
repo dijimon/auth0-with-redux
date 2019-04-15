@@ -6,6 +6,7 @@ import SubItemsList from './SubMenuItems';
 
 export default class SideMenuItem extends Component {
   static propTypes = {
+    id: PropTypes.number,
     item: PropTypes.object.isRequired,
     subItems: PropTypes.array,
     isCollapsible: PropTypes.bool,
@@ -16,6 +17,7 @@ export default class SideMenuItem extends Component {
   };
 
   static defaultProps = {
+    id: 0,
     subItems: [],
     isCollapsible: false,
   };
@@ -71,6 +73,7 @@ export default class SideMenuItem extends Component {
 
   render() {
     const {
+      id,
       item: { to },
       isCollapsible,
       subItems,
@@ -80,7 +83,7 @@ export default class SideMenuItem extends Component {
     } = this.props;
     const { isVisible } = this.state;
     return (
-      <li className={this.getClassName(to, path)} onClickCapture={to ? this.setCurrentRoute : null}>
+      <li id={`menuItem-${id}`} className={this.getClassName(to, path)} onClickCapture={to ? this.setCurrentRoute : null}>
         {to ? (
           <Link className="menu-item__link" to={to}>
             {this._renderItem()}

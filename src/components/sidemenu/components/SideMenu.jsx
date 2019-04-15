@@ -108,25 +108,28 @@ class SideMenu extends PureComponent {
         {isExpandable && <Footer onExpand={this.onExpand} expanded={expanded} />}
         <Header logo={!expanded ? '/public/assets/top-menu-logo.png' : ''} title="" />
         <ul className="side-menu" ref={this.setMenuRef} style={styles}>
-          {items.map(({ icon, title, subItems, isCollapsible, to, iconClassName, plainText }, index) => (
-            <SideMenuItem
-              key={index.toString()}
-              item={{
-                icon,
-                title,
-                to,
-                index,
-                iconClassName,
-                plainText,
-              }}
-              subItems={subItems}
-              isCollapsible={isCollapsible}
-              onChangePathname={this.onChangePathname}
-              currentRoute={this.state.currentRoute}
-              defaultIconClassName={defaultIconClassName}
-              expanded={expanded}
-            />
-          ))}
+          {items.map(({ icon, title, subItems, isCollapsible, to, iconClassName, plainText }, index) => {
+            return (
+              <SideMenuItem
+                key={index.toString()}
+                id={index}
+                item={{
+                  icon,
+                  title,
+                  to,
+                  index,
+                  iconClassName,
+                  plainText,
+                }}
+                subItems={subItems}
+                isCollapsible={isCollapsible}
+                onChangePathname={this.onChangePathname}
+                currentRoute={this.state.currentRoute}
+                defaultIconClassName={defaultIconClassName}
+                expanded={expanded}
+              />
+            );
+          })}
         </ul>
       </nav>,
       <div
