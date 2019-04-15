@@ -18,10 +18,13 @@ pipelines:
           - npm test
           - npm run build:development
           - export IMAGE_NAME=gcr.io/fabric-platform/frontend:$BITBUCKET_COMMIT
+          - export IMAGE_LATEST=gcr.io/fabric-platform/frontend:latest
           - echo $GCLOUD_JSON_FILE > ~/.gcloud-api-key.json
           - docker login -u _json_key -p "$(cat ~/.gcloud-api-key.json)" https://gcr.io/$GCLOUD_PROJECT
           - docker build -t $IMAGE_NAME . -f .docker/Dockerfile
+          - docker tag $IMAGE_NAME $IMAGE_LATEST
           - docker push $IMAGE_NAME
+          - docker push $IMAGE_LATEST
     - step:
         name: deployment to k8s
         image: google/cloud-sdk:latest
