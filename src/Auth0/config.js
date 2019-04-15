@@ -11,7 +11,7 @@ export const AUTH_CONFIG = {
     usernameStyle: 'email',
     auth: {
       responseType: 'token id_token',
-      redirect: false,
+      redirect: true,
       audience: 'https://nma.catalyst.intellecteu.com/api',
       //returnTo: 'http://localhost:3000/login',
     },

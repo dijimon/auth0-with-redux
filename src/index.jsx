@@ -15,7 +15,7 @@ import './index.scss';
 import registerServiceWorker from './registerServiceWorker';
 
 //Pages
-import Peers from './pages/Peers';
+import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 
 const store = initStore();
@@ -25,8 +25,7 @@ ReactDOM.render(
     <Router history={history}>
       <Switch>
         <Route path="/login" component={App} />
-        <PrivateRoute exact path="/" component={Peers} />
-        <PrivateRoute exact path="/peers" component={Peers} />
+        <PrivateRoute exact path="/" component={Home} />
         <Route path="*" component={NotFound} />
       </Switch>
     </Router>

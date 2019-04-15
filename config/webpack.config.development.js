@@ -24,7 +24,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.jsx|.js?$/,
         exclude: /node_modules/,
         use: 'babel-loader',
       },
@@ -47,7 +47,7 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: true,
-              localIdentName: '[local]-[hash:base64:5]',
+              localIdentName: '[local]',
             },
           },
           {

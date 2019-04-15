@@ -34,7 +34,7 @@ class App extends Component {
         console.log('error ', error);
       });
 
-      // this.props.history.push('/peers');
+      // this.props.history.push('/');
     });
   }
 
